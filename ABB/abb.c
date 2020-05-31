@@ -71,7 +71,7 @@ int arbol_insertar(abb_t* arbol, void* elemento){
     if(!arbol)
         return ERROR;
 
-    if(arbol->nodo_raiz == NULL){   /* REMPLAZAR POR ESTA VACIO */
+    if(arbol_vacio(arbol)){  
         nodo_abb_t* nodo = crear_nodo(elemento);
         arbol->nodo_raiz = nodo;
         return EXITO;
@@ -93,7 +93,7 @@ void* arbol_raiz(abb_t* arbol){
     if(arbol_vacio(arbol))
         return NULL;
     
-    return arbol->nodo_raiz;
+    return arbol->nodo_raiz->elemento;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void* buscar_recursivo(abb_t* arbol, nodo_abb_t* raiz, void* elemento){
@@ -136,7 +136,7 @@ void inorden_recursivo(nodo_abb_t* nodo, void** array, int* llenados, int tope){
     if((*llenados) >= tope)
         return;
 
-    array[llenados] = nodo->elemento;
+    array[(*llenados)] = nodo->elemento;
     (*llenados)++;
     if(nodo->derecha && (*llenados)>=tope){
         inorden_recursivo(nodo->derecha, array, llenados, tope);
@@ -145,11 +145,11 @@ void inorden_recursivo(nodo_abb_t* nodo, void** array, int* llenados, int tope){
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int arbol_recorrido_inorden(abb_t* arbol, void** array, int tamanio_array){
-    if(arbol_vacio)
+    if(arbol_vacio(arbol))
         return VACIO;
     
     int llenados = VACIO;
-    array = malloc(tamanio_array*sizeof(*void));
+    array = malloc((size_t)tamanio_array*sizeof(void*));
     inorden_recursivo(arbol->nodo_raiz, array, &llenados, tamanio_array);
     return llenados;
 }
@@ -161,7 +161,7 @@ void preorden_recursivo(nodo_abb_t* nodo, void** array, int* llenados, int tope)
     if((*llenados) >= tope)
         return;
 
-    array[llenados] = nodo->elemento;
+    array[*llenados] = nodo->elemento;
     (*llenados)++;
     if(nodo->izquierda && (*llenados)>=tope){
         preorden_recursivo(nodo->izquierda, array, llenados, tope);
@@ -173,11 +173,11 @@ void preorden_recursivo(nodo_abb_t* nodo, void** array, int* llenados, int tope)
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int arbol_recorrido_preorden(abb_t* arbol, void** array, int tamanio_array){
-    if(arbol_vacio)
-        return 0;
+    if(arbol_vacio(arbol))
+        return VACIO;
     
-    int llenados = 0;
-    array = malloc(tamanio_array*sizeof(*void));
+    int llenados = VACIO;
+    array = malloc((size_t)tamanio_array*sizeof(void*));
     preorden_recursivo(arbol->nodo_raiz, array, &llenados, tamanio_array);
     return llenados;
 }
@@ -195,27 +195,85 @@ void postorden_recursivo(nodo_abb_t* nodo, void** array, int* llenados, int tope
     if((*llenados) >= tope)
         return;
 
-    array[llenados] = nodo->elemento;
+    array[*llenados] = nodo->elemento;
     (*llenados)++;
-
     return;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int arbol_recorrido_postorden(abb_t* arbol, void** array, int tamanio_array){
-    if(arbol_vacio)
-        return 0;
+    if(arbol_vacio(arbol))
+        return VACIO;
     
-    int llenados = 0;
-    array = malloc(tamanio_array*sizeof(*void));
+    int llenados = VACIO;
+    array = malloc((size_t)tamanio_array*sizeof(void*));
     postorden_recursivo(arbol->nodo_raiz, array, &llenados, tamanio_array);
     return llenados;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+void destruir_nodo(nodo_abb_t* nodo, abb_liberar_elemento destructor){
+    if(destructor)
+        destructor(nodo->elemento);
+    
+    free(nodo);
+}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int borrar_recursivo(nodo_abb_t** puntero_a_nodo, abb_liberar_elemento destructor){
+    nodo_abb_t* nodo = *puntero_a_nodo;
+    nodo_abb_t* auxiliar;
+    if(!nodo->izquierda && !nodo->derecha){
+        auxiliar = NULL;
+    }else if(nodo->izquierda && !nodo->derecha){
+        auxiliar = nodo->izquierda;
+    }else if(!nodo->izquierda && nodo->derecha){
+        auxiliar = nodo->derecha;
+    }else{
+        auxiliar = nodo->izquierda;
+        if(!auxiliar->derecha){
+            borrar_recursivo(&nodo->izquierda, NULL);
+        }else{
+            while((auxiliar->derecha)->derecha != NULL){
+                auxiliar = auxiliar->derecha;
+            }
+            nodo_abb_t* nodo_obj = auxiliar->derecha;
+            borrar_recursivo(&auxiliar->derecha, NULL);
+            auxiliar = nodo_obj;
+        }
+        auxiliar->derecha = nodo->derecha;
+        auxiliar->izquierda = nodo->izquierda;
+    }
+    if(destructor)
+        destruir_nodo(nodo, destructor);
 
+    *puntero_a_nodo = auxiliar;
+    return EXITO;
+}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+nodo_abb_t** buscar_nodo(nodo_abb_t** puntero_a_nodo, void* elemento, abb_comparador comparador){
+    nodo_abb_t* nodo = *puntero_a_nodo;
+    int comparar = comparador(elemento, nodo->elemento);
+    if(!nodo || comparar == COINCIDENCIA){ /*En caso que nodo no exista, devolvera NULL*/
+        return puntero_a_nodo;
+    }else if(comparar > COINCIDENCIA){
+        return buscar_nodo(&nodo->derecha, elemento, comparador);
+    }else{
+        return buscar_nodo(&nodo->izquierda, elemento, comparador);
+    }
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int arbol_borrar(abb_t* arbol, void* elemento){
+    if(arbol_vacio(arbol))
+        return ERROR;
 
+    nodo_abb_t** puntero_a_nodo = buscar_nodo(&arbol->nodo_raiz, elemento,arbol->comparador);
+    if(!puntero_a_nodo)
+        return ERROR;
+
+    return borrar_recursivo(puntero_a_nodo, arbol->destructor);
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void arbol_destruir(abb_t* arbol){
+    free(arbol);
+}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
