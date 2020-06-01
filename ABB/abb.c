@@ -130,7 +130,7 @@ void inorden_recursivo(nodo_abb_t* nodo, void** array, int* llenados, int tope){
     if(!nodo)
         return;
     
-    if(nodo->izquierda && (*llenados)>=tope){
+    if(nodo->izquierda){
         inorden_recursivo(nodo->izquierda, array, llenados, tope);
     }
     if((*llenados) >= tope)
@@ -138,7 +138,7 @@ void inorden_recursivo(nodo_abb_t* nodo, void** array, int* llenados, int tope){
 
     array[(*llenados)] = nodo->elemento;
     (*llenados)++;
-    if(nodo->derecha && (*llenados)>=tope){
+    if(nodo->derecha){
         inorden_recursivo(nodo->derecha, array, llenados, tope);
     }
     return;
@@ -149,7 +149,6 @@ int arbol_recorrido_inorden(abb_t* arbol, void** array, int tamanio_array){
         return VACIO;
     
     int llenados = VACIO;
-    array = malloc((size_t)tamanio_array*sizeof(void*));
     inorden_recursivo(arbol->nodo_raiz, array, &llenados, tamanio_array);
     return llenados;
 }
@@ -163,10 +162,10 @@ void preorden_recursivo(nodo_abb_t* nodo, void** array, int* llenados, int tope)
 
     array[*llenados] = nodo->elemento;
     (*llenados)++;
-    if(nodo->izquierda && (*llenados)>=tope){
+    if(nodo->izquierda){
         preorden_recursivo(nodo->izquierda, array, llenados, tope);
     }
-    if(nodo->derecha && (*llenados)>=tope){
+    if(nodo->derecha){
         preorden_recursivo(nodo->derecha, array, llenados, tope);
     }
     return;
@@ -177,7 +176,6 @@ int arbol_recorrido_preorden(abb_t* arbol, void** array, int tamanio_array){
         return VACIO;
     
     int llenados = VACIO;
-    array = malloc((size_t)tamanio_array*sizeof(void*));
     preorden_recursivo(arbol->nodo_raiz, array, &llenados, tamanio_array);
     return llenados;
 }
@@ -186,10 +184,10 @@ void postorden_recursivo(nodo_abb_t* nodo, void** array, int* llenados, int tope
     if(!nodo)
         return;
     
-    if(nodo->izquierda && (*llenados)>=tope){
+    if(nodo->izquierda){
         postorden_recursivo(nodo->izquierda, array, llenados, tope);
     }
-    if(nodo->derecha && (*llenados)>=tope){
+    if(nodo->derecha){
         postorden_recursivo(nodo->derecha, array, llenados, tope);
     }
     if((*llenados) >= tope)
@@ -205,7 +203,6 @@ int arbol_recorrido_postorden(abb_t* arbol, void** array, int tamanio_array){
         return VACIO;
     
     int llenados = VACIO;
-    array = malloc((size_t)tamanio_array*sizeof(void*));
     postorden_recursivo(arbol->nodo_raiz, array, &llenados, tamanio_array);
     return llenados;
 }
@@ -264,6 +261,10 @@ int arbol_borrar(abb_t* arbol, void* elemento){
     if(arbol_vacio(arbol))
         return ERROR;
 
+    if(!arbol->comparador || !arbol->destructor)
+        return ERROR;
+
+
     nodo_abb_t** puntero_a_nodo = buscar_nodo(&arbol->nodo_raiz, elemento,arbol->comparador);
     if(!puntero_a_nodo)
         return ERROR;
@@ -271,9 +272,68 @@ int arbol_borrar(abb_t* arbol, void* elemento){
     return borrar_recursivo(puntero_a_nodo, arbol->destructor);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void destructor_postorden(nodo_abb_t* nodo, abb_liberar_elemento destructor){
+    if(!nodo)
+        return;
+    
+    if(nodo->izquierda){
+        destructor_postorden(nodo->izquierda, destructor);
+    }
+    if(nodo->derecha){
+        destructor_postorden(nodo->derecha, destructor);
+    }
+    destruir_nodo(nodo, destructor);
+    return;
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void arbol_destruir(abb_t* arbol){
+    if(!arbol_vacio(arbol))
+        destructor_postorden(arbol->nodo_raiz, arbol->destructor);
+
     free(arbol);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void inorden_recursivo_iterador(nodo_abb_t* nodo, bool (*funcion)(void*, void*), void* extra){
+    if(!nodo)
+        return;
 
+    inorden_recursivo_iterador(nodo->izquierda, funcion, extra);
+    if(funcion(nodo->elemento, extra))
+        return;
+
+    inorden_recursivo_iterador(nodo->derecha, funcion, extra);
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void postorden_recursivo_iterador(nodo_abb_t* nodo, bool (*funcion)(void*, void*), void* extra){
+    if(!nodo)
+        return;
+
+    postorden_recursivo_iterador(nodo->izquierda, funcion, extra);
+    postorden_recursivo_iterador(nodo->derecha, funcion, extra);
+    if(funcion(nodo->elemento, extra))
+        return;
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void preorden_recursivo_iterador(nodo_abb_t* nodo, bool (*funcion)(void*, void*), void* extra){
+    if(!nodo)
+        return;
+
+    if(funcion(nodo->elemento, extra))
+        return;
+    preorden_recursivo_iterador(nodo->izquierda, funcion, extra);
+    preorden_recursivo_iterador(nodo->derecha, funcion, extra);
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void abb_con_cada_elemento(abb_t* arbol, int recorrido, bool (*funcion)(void*, void*), void* extra){
+    if(arbol_vacio(arbol))
+        return;
+    
+    if(recorrido == ABB_RECORRER_INORDEN){
+        inorden_recursivo_iterador(arbol->nodo_raiz, funcion, extra);
+    }else if(recorrido == ABB_RECORRER_POSTORDEN){
+        postorden_recursivo_iterador(arbol->nodo_raiz, funcion, extra);
+    }else if(recorrido == ABB_RECORRER_PREORDEN){
+        preorden_recursivo_iterador(arbol->nodo_raiz, funcion, extra);
+    }
+}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
