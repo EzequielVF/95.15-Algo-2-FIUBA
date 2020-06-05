@@ -43,6 +43,30 @@ void destructor_de_cosas(void* elemento){
 	destruir_cosa((cosa_t*)elemento);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void prueba_borrado(pa2m_t* probador){
+	abb_t* arbol = arbol_crear(comparar_cosas, destructor_de_cosas);
+	cosa_t* c1= crear_cosa(1);
+	cosa_t* c2= crear_cosa(2);
+	cosa_t* c3= crear_cosa(3);
+	cosa_t* c4= crear_cosa(4);
+	printf("*********************************************\n");
+    pa2m_avisar("Pruebas de borrado");
+    printf("*********************************************\n");
+	pa2m_asegurar(probador, "Puedo insertar 2:", arbol_insertar(arbol, c2) == 0);
+	pa2m_asegurar(probador, "Puedo insertar 1:", arbol_insertar(arbol, c1) == 0);
+	pa2m_asegurar(probador, "Puedo insertar 3:", arbol_insertar(arbol, c3) == 0);
+	pa2m_asegurar(probador, "Borrado fallido, el elemento no existe:(C4)", arbol_borrar(arbol,c4) == -1);
+	pa2m_asegurar(probador, "Borrado exitoso:(C2)", arbol_borrar(arbol,c2) == 0);
+	c2= crear_cosa(2);
+	pa2m_asegurar(probador, "Borrado fallido, el elemento ya no esta en el arbol:(C2)", arbol_borrar(arbol,c2) == -1);
+	arbol_destruir(arbol);
+	destructor_de_cosas(c4);
+	destructor_de_cosas(c2);
+    printf("*********************************************\n");
+    pa2m_mostrar_estadisticas(probador);
+    printf("*********************************************\n");
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void probar_inicializacion(pa2m_t* probador){
     abb_t* arbol = arbol_crear(comparar_cosas, destructor_de_cosas);
 	cosa_t* c4= crear_cosa(4);
@@ -98,20 +122,21 @@ void probar_uso_arbol(pa2m_t* probador){
 	printf("*********************************************\n");
     pa2m_avisar("Pruebas de reacomodacion");
     printf("*********************************************\n");
-	pa2m_asegurar(probador, "Borrado exitoso:", arbol_borrar(arbol,c4) == 0);
+	pa2m_asegurar(probador, "Borrado exitoso(C4):", arbol_borrar(arbol,c4) == 0);
 	pa2m_asegurar(probador, "La raiz es la adecuada:", ((cosa_t*)arbol_raiz(arbol))->clave==3);
-	pa2m_asegurar(probador, "Borrado exitoso:", arbol_borrar(arbol,c3) == 0);
+	pa2m_asegurar(probador, "Borrado exitoso(C3):", arbol_borrar(arbol,c3) == 0);
 	pa2m_asegurar(probador, "La raiz es la adecuada:", ((cosa_t*)arbol_raiz(arbol))->clave==2);
-	pa2m_asegurar(probador, "Borrado exitoso:", arbol_borrar(arbol,c6) == 0);
-	pa2m_asegurar(probador, "Borrado exitoso:", arbol_borrar(arbol,c2) == 0);
+	pa2m_asegurar(probador, "Borrado exitoso(C6):", arbol_borrar(arbol,c6) == 0);
+	pa2m_asegurar(probador, "Borrado exitoso:(C2)", arbol_borrar(arbol,c2) == 0);
 	pa2m_asegurar(probador, "La raiz es la adecuada:", ((cosa_t*)arbol_raiz(arbol))->clave==1);
-	pa2m_asegurar(probador, "Borrado exitoso:", arbol_borrar(arbol,c1) == 0);
+	pa2m_asegurar(probador, "Borrado exitoso(C1):", arbol_borrar(arbol,c1) == 0);
 	pa2m_asegurar(probador, "La raiz es la adecuada:", ((cosa_t*)arbol_raiz(arbol))->clave==5);
-	pa2m_asegurar(probador, "Borrado exitoso:", arbol_borrar(arbol,c5) == 0);
+	pa2m_asegurar(probador, "Borrado exitoso(C5):", arbol_borrar(arbol,c5) == 0);
 	pa2m_asegurar(probador, "La raiz es la adecuada:", ((cosa_t*)arbol_raiz(arbol))->clave==7);
-	pa2m_asegurar(probador, "Borrado exitoso:", arbol_borrar(arbol,c7) == 0);
+	pa2m_asegurar(probador, "Borrado exitoso(C7):", arbol_borrar(arbol,c7) == 0);
 	pa2m_asegurar(probador, "Arbol vacio devuelve true:", arbol_vacio(arbol) == true);
 	pa2m_asegurar(probador, "Arbol vacio devuelve raiz NULL:", arbol_raiz(arbol) == NULL);
+	pa2m_asegurar(probador, "Borrado fallido, no hay elementos que borrar(C7):", arbol_borrar(arbol,c7) == -1);
 	arbol_destruir(arbol);
     printf("*********************************************\n");
     pa2m_mostrar_estadisticas(probador);
@@ -215,13 +240,13 @@ void pruebas_arbol_lleno_elementos_iguales(pa2m_t* probador){
 	pa2m_asegurar(probador, "Puedo insertar 3:", arbol_insertar(arbol, c3) == 0);
 	pa2m_asegurar(probador, "Puedo insertar 5:", arbol_insertar(arbol, c5) == 0);
 	pa2m_asegurar(probador, "Puedo insertar 7:", arbol_insertar(arbol, c7) == 0);
-	pa2m_asegurar(probador, "Elemento encontrado!", ((cosa_t*)arbol_buscar(arbol, c4))->clave==5);
-	pa2m_asegurar(probador, "Elemento encontrado!", ((cosa_t*)arbol_buscar(arbol, c2))->clave==5);
-	pa2m_asegurar(probador, "Elemento encontrado!", ((cosa_t*)arbol_buscar(arbol, c6))->clave==5);
-	pa2m_asegurar(probador, "Elemento encontrado!", ((cosa_t*)arbol_buscar(arbol, c1))->clave==5);
-	pa2m_asegurar(probador, "Elemento encontrado!", ((cosa_t*)arbol_buscar(arbol, c3))->clave==5);
-	pa2m_asegurar(probador, "Elemento encontrado!", ((cosa_t*)arbol_buscar(arbol, c5))->clave==5);
-	pa2m_asegurar(probador, "Elemento encontrado!", ((cosa_t*)arbol_buscar(arbol, c7))->clave==5);
+	pa2m_asegurar(probador, "Elemento encontrado!(C4)", ((cosa_t*)arbol_buscar(arbol, c4))->clave==5);
+	pa2m_asegurar(probador, "Elemento encontrado!(C2)", ((cosa_t*)arbol_buscar(arbol, c2))->clave==5);
+	pa2m_asegurar(probador, "Elemento encontrado!(C6)", ((cosa_t*)arbol_buscar(arbol, c6))->clave==5);
+	pa2m_asegurar(probador, "Elemento encontrado!(C1)", ((cosa_t*)arbol_buscar(arbol, c1))->clave==5);
+	pa2m_asegurar(probador, "Elemento encontrado!(C3)", ((cosa_t*)arbol_buscar(arbol, c3))->clave==5);
+	pa2m_asegurar(probador, "Elemento encontrado!(C5)", ((cosa_t*)arbol_buscar(arbol, c5))->clave==5);
+	pa2m_asegurar(probador, "Elemento encontrado!(C7)", ((cosa_t*)arbol_buscar(arbol, c7))->clave==5);
 	pa2m_avisar("Recorrido inorden:");
 	cantidad = arbol_recorrido_inorden(arbol, (void**)elementos_inorden, 10);
 	for(int i=0; i<cantidad; i++)
@@ -237,13 +262,13 @@ void pruebas_arbol_lleno_elementos_iguales(pa2m_t* probador){
 	for(int i=0;i<cantidad;i++)
 		printf("%i ", elementos_postorden[i]->clave);
 	printf("\n");
-	pa2m_asegurar(probador, "Borrado exitoso:", arbol_borrar(arbol,c4) == 0);
-	pa2m_asegurar(probador, "Borrado exitoso:", arbol_borrar(arbol,c2) == 0);
-	pa2m_asegurar(probador, "Borrado exitoso:", arbol_borrar(arbol,c6) == 0);
-	pa2m_asegurar(probador, "Borrado exitoso:", arbol_borrar(arbol,c1) == 0);
-	pa2m_asegurar(probador, "Borrado exitoso:", arbol_borrar(arbol,c3) == 0);
-	pa2m_asegurar(probador, "Borrado exitoso:", arbol_borrar(arbol,c5) == 0);
-	pa2m_asegurar(probador, "Borrado exitoso:", arbol_borrar(arbol,c7) == 0);
+	pa2m_asegurar(probador, "Borrado exitoso:(C4)", arbol_borrar(arbol,c4) == 0);
+	pa2m_asegurar(probador, "Borrado exitoso:(C2)", arbol_borrar(arbol,c2) == 0);
+	pa2m_asegurar(probador, "Borrado exitoso:(C6)", arbol_borrar(arbol,c6) == 0);
+	pa2m_asegurar(probador, "Borrado exitoso:(C1)", arbol_borrar(arbol,c1) == 0);
+	pa2m_asegurar(probador, "Borrado exitoso:(C3)", arbol_borrar(arbol,c3) == 0);
+	pa2m_asegurar(probador, "Borrado exitoso:(C5)", arbol_borrar(arbol,c5) == 0);
+	pa2m_asegurar(probador, "Borrado exitoso:(C7)", arbol_borrar(arbol,c7) == 0);
 	arbol_destruir(arbol);
     printf("*********************************************\n");
     pa2m_mostrar_estadisticas(probador);
@@ -318,7 +343,7 @@ void pruebas_destructor_null(pa2m_t* probador){
     printf("*********************************************\n");
 	pa2m_asegurar(probador, "Arbol inserta correctamente:", arbol_insertar(arbol, c4) == 0);
 	pa2m_asegurar(probador, "Arbol inserta correctamente:", arbol_insertar(arbol, c5) == 0);
-	pa2m_asegurar(probador, "Al borrar sin comparador tira error:", arbol_borrar(arbol, c4) == -1);
+	pa2m_asegurar(probador, "Al borrar sin destructor tira error:", arbol_borrar(arbol, c4) == -1);
 	arbol_destruir(arbol);
 	destructor_de_cosas(c4);
 	destructor_de_cosas(c5);
@@ -331,6 +356,7 @@ int main(){
     pa2m_t* probador = pa2m_crear();
     probar_inicializacion(probador);
 	probar_uso_arbol(probador);
+	prueba_borrado(probador);
 	pruebas_recorrido(probador);
 	pruebas_arbol_lleno_elementos_iguales(probador);
 	pruebas_con_arbol_null(probador);
