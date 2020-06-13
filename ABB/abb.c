@@ -74,13 +74,13 @@ int borrar_recursivo(nodo_abb_t** puntero_a_nodo, abb_liberar_elemento destructo
     }else{ //2 HIJOS
         auxiliar = (*puntero_a_nodo)->izquierda;
         if(!auxiliar->derecha){
-            borrar_recursivo(&(*puntero_a_nodo)->izquierda, NULL); //Paso NULL como destructor porque no busco en realidad destruir el elemento, sino borrar los restos del nodo que voy a mover hacia arriba.
+            borrar_recursivo(&(*puntero_a_nodo)->izquierda, NULL); //Paso NULL como destructor porque no busco en realidad destruir el elemento, sino borrar los restos del nodo que voy a mover.
         }else{
             while((auxiliar->derecha)->derecha != NULL){
                 auxiliar = auxiliar->derecha;
             }
             nodo_abb_t* nodo_obj = auxiliar->derecha;
-            borrar_recursivo(&auxiliar->derecha, NULL); //Paso NULL como destructor porque no busco en realidad destruir el elementom, sino borrar los restos del nodo que voy a mover hacia arriba.
+            borrar_recursivo(&auxiliar->derecha, NULL); //Paso NULL como destructor porque no busco en realidad destruir el elementom, sino borrar los restos del nodo que voy a mover.
             auxiliar = nodo_obj;
         }
         auxiliar->derecha = (*puntero_a_nodo)->derecha;
@@ -94,10 +94,7 @@ int borrar_recursivo(nodo_abb_t** puntero_a_nodo, abb_liberar_elemento destructo
 }
 
 int arbol_borrar(abb_t* arbol, void* elemento){
-    if(arbol_vacio(arbol))
-        return ERROR;
-
-    if(!arbol->comparador || !arbol->destructor)
+    if(arbol_vacio(arbol) || !arbol->comparador || !arbol->destructor)
         return ERROR;
 
     nodo_abb_t** puntero_a_nodo = buscar_nodo(&arbol->nodo_raiz, elemento,arbol->comparador);
@@ -145,10 +142,7 @@ void* arbol_raiz(abb_t* arbol){
 }
 ///////////////////////////////////////////////////////ARBOL VACIO////////////////////////////////////////////////////////////////////////////////
 bool arbol_vacio(abb_t* arbol){
-    if(!arbol)
-        return true;
-    
-    if(!arbol->nodo_raiz)
+    if((!arbol) || (!arbol->nodo_raiz))
         return true;
     
     return false;
@@ -182,12 +176,9 @@ int arbol_recorrido_inorden(abb_t* arbol, void** array, int tamanio_array){
 }
 //////////////////////////////////////////////////////ARBOL RECORRIDO PREORDEN////////////////////////////////////////////////////////////////////
 void preorden_recursivo(nodo_abb_t* nodo, void** array, int* llenados, int tope){
-    if(!nodo)
+    if((!nodo) || ((*llenados) >= tope))
         return;
     
-    if((*llenados) >= tope)
-        return;
-
     array[*llenados] = nodo->elemento;
     (*llenados)++;
     if(nodo->izquierda){
@@ -288,7 +279,7 @@ void preorden_recursivo_iterador(nodo_abb_t* nodo, bool (*funcion)(void*, void*)
 }
 
 void abb_con_cada_elemento(abb_t* arbol, int recorrido, bool (*funcion)(void*, void*), void* extra){
-    if(arbol_vacio(arbol))
+    if(arbol_vacio(arbol) || !funcion)
         return;
     
     if(recorrido == ABB_RECORRER_INORDEN){
@@ -342,17 +333,16 @@ void destruir_nodo(nodo_abb_t* nodo, abb_liberar_elemento destructor){
  * Devuelve un puntero de un puntero a un nodo con el elemento buscado.
  */
 nodo_abb_t** buscar_nodo(nodo_abb_t** puntero_a_nodo, void* elemento, abb_comparador comparador){
-    nodo_abb_t* nodo = *puntero_a_nodo;
-    if(!nodo)
+    if(!(*puntero_a_nodo))
         return NULL;
 
-    int comparar = comparador(elemento, nodo->elemento);
-    if(!nodo || comparar == COINCIDENCIA){ /*En caso que nodo no exista, devolvera NULL*/
+    int comparar = comparador(elemento, (*puntero_a_nodo)->elemento);
+    if(comparar == COINCIDENCIA){ 
         return puntero_a_nodo;
     }else if(comparar > COINCIDENCIA){
-        return buscar_nodo(&nodo->derecha, elemento, comparador);
+        return buscar_nodo(&(*puntero_a_nodo)->derecha, elemento, comparador);
     }else{
-        return buscar_nodo(&nodo->izquierda, elemento, comparador);
+        return buscar_nodo(&(*puntero_a_nodo)->izquierda, elemento, comparador);
     }
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
