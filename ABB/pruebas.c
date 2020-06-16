@@ -353,7 +353,7 @@ void pruebas_destructor_null(pa2m_t* probador){
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool mostrar_elemento(void* elemento, void* extra){
-	extra=extra; //para que no se queje el compilador, gracias -Werror -Wall
+	extra=extra;
 	
 	if(elemento)
 		printf("%i ", ((cosa_t*)elemento)->clave);
@@ -361,13 +361,13 @@ bool mostrar_elemento(void* elemento, void* extra){
 	return false;
 }
 
-bool cuento_elementos(void* elemento, void* extra){
-	if(elemento && extra){
+bool cantidad_elementos(void* elemento, void* extra){
+	if(elemento && extra)
 		*(int*)extra+= 1;
-		printf("%i ", *(int*)extra);
-	}
+
 	return false;
 }
+
 
 void pruebas_iterador(pa2m_t* probador){
 	abb_t* arbol = arbol_crear(comparar_cosas, destructor_de_cosas);
@@ -402,16 +402,17 @@ void pruebas_iterador(pa2m_t* probador){
 	printf("\n");
 
 	printf("Cuento elementos INORDEN: ");    
-	abb_con_cada_elemento(arbol, ABB_RECORRER_INORDEN, cuento_elementos, &contador);
-	printf("\n");
+	abb_con_cada_elemento(arbol, ABB_RECORRER_INORDEN, cantidad_elementos, &contador);
+	printf("%d \n", contador);
 	contador = 0;
 	printf("Cuento elementos PREORDEN: ");    
-	abb_con_cada_elemento(arbol, ABB_RECORRER_PREORDEN, cuento_elementos, &contador);
-	printf("\n");
+	abb_con_cada_elemento(arbol, ABB_RECORRER_PREORDEN, cantidad_elementos, &contador);
+	printf("%d \n", contador);
 	contador = 0;
 	printf("Cuento elementos POSTORDEN: ");    
-	abb_con_cada_elemento(arbol, ABB_RECORRER_POSTORDEN, cuento_elementos, &contador);
-	printf("\n");
+	abb_con_cada_elemento(arbol, ABB_RECORRER_POSTORDEN, cantidad_elementos, &contador);
+	printf("%d \n", contador);
+	contador = 0;
 	arbol_destruir(arbol);
 	printf("*********************************************\n");
     pa2m_mostrar_estadisticas(probador);

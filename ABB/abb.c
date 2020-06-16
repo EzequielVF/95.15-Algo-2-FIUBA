@@ -80,7 +80,7 @@ int borrar_recursivo(nodo_abb_t** puntero_a_nodo, abb_liberar_elemento destructo
                 auxiliar = auxiliar->derecha;
             }
             nodo_abb_t* nodo_obj = auxiliar->derecha;
-            borrar_recursivo(&auxiliar->derecha, NULL); //Paso NULL como destructor porque no busco en realidad destruir el elementom, sino borrar los restos del nodo que voy a mover.
+            borrar_recursivo(&auxiliar->derecha, NULL); //Paso NULL como destructor porque no busco en realidad destruir el elemento, sino borrar los restos del nodo que voy a mover.
             auxiliar = nodo_obj;
         }
         auxiliar->derecha = (*puntero_a_nodo)->derecha;
