@@ -102,7 +102,7 @@ int arbol_borrar(abb_t* arbol, void* elemento){
     void* verificador = &basura; //Tuve que agregar esto, ya que cuando pense la implementacion me olvide los casos en que se use el arbol con datos simples
                                  //ya que usaba en la implementancion destructor NULL en los llamados recursivos para indicar que no debia borrarse,
                                  //con esta modificacion uso este puntero extra para saber cuando en verdad quiero borrar o cuando solo
-                                 //borro en nodo pero no quiero liberarlos elementos. 
+                                 //borro el nodo pero no quiero liberar los elementos. Su uso puede observarse en borrar_recursivo.
 
     nodo_abb_t** puntero_a_nodo = buscar_nodo(&arbol->nodo_raiz, elemento,arbol->comparador);
     if(!puntero_a_nodo)

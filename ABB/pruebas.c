@@ -329,14 +329,15 @@ void pruebas_destructor_null(pa2m_t* probador){
 	abb_t* arbol = arbol_crear(comparar_cosas, NULL);
 	int c4= 4;
 	int c5= 5;
-	
+	int c6= 6;
 	printf("*********************************************\n");
     pa2m_avisar("Pruebas con destructor NULL");
     printf("*********************************************\n");
 	pa2m_asegurar(probador, "Arbol inserta correctamente:", arbol_insertar(arbol, &c4) == 0);
 	pa2m_asegurar(probador, "Arbol inserta correctamente:", arbol_insertar(arbol, &c5) == 0);
-	pa2m_asegurar(probador, "Borra el nodo aunque no haya destructor:", arbol_borrar(arbol, &c4) == 0);
-	pa2m_asegurar(probador, "Borra el nodo aunque no haya destructor:", arbol_borrar(arbol, &c5) == 0);
+	pa2m_asegurar(probador, "Arbol inserta correctamente:", arbol_insertar(arbol, &c6) == 0);
+	pa2m_asegurar(probador, "Borra el nodo aunque no haya destructor (no lo necesita dato simple):", arbol_borrar(arbol, &c4) == 0);
+	pa2m_asegurar(probador, "Borra el nodo aunque no haya destructor (no lo necesita dato simple):", arbol_borrar(arbol, &c5) == 0);
 	arbol_destruir(arbol);
 	printf("*********************************************\n");
     pa2m_mostrar_estadisticas(probador);
