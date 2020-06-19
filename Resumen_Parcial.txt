@@ -1,0 +1,264 @@
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Estructura de la memoria de un programa:
+hola.c--(Preprocesador cpp)-->hola.i--(compilador)-->hola.s--(Ensamblador as)-->hola.o--(link edito ld)-->hola-->
+
+Codigo (.code): En esta seccion del programa se almacenan el codigo del mismo, una vez traducido por el
+compilador.
+Datos (.data): En esta seccion se almacena los datos de los valores literales y valores globales del programa.
+Pila de ejecucion (execution stack o .stack): no existe hasta que el programa es ejecutado.
+Montıculo (.heap): no existe hasta que el programa es ejecutado.
+
+La memoria dinamica es aquella que sera reservada y utilizada unicamente en tiempo de ejecucion. La memoria
+dinamica es reservada en la seccion .heap o en el heap del programa. Para utilizar este tipo de memoria el programador
+debe hacerlo de forma explıcita solicitandoselo al sistema operativo. 
+
+Punteros: Un puntero es un tipo de variable que guarda una direccion de memoria.
+La operacion aritmetica de punteros son basicamente la suma y la resta. Y sirven para recorrer arreglos.
+Si vos haces por ejemplo puntero_arreglo++, avanzas una posición en el arreglo. Si estuviera en la posición 0, 
+y haces puntero_arreglo + 2, accedes a la tercera posición del arreglo (Porque arranca en 0).
+
+La funcion void* malloc(size) reserva size bytes y devuelve un puntero a la memoria reservada. La memoria no esta
+inicializada. Si el valor de size es 0 esta puede devolver, NULL o un valor a un puntero unico que posteriormente
+podra ser pasado a la funcion free() para ser liberado.
+
+La funcion free() libera espacio de memoria apuntado por el puntero (ptr) que debe haber sido devuelto previamente 
+por una llamada a la funcion malloc(), calloc() o realloc(). De otra forma o si free(ptr) ha sido ya ejecutado
+anteriormente, ocurrira un comportamiento no definido. Si ptr es NULL, la operacion no se realiza.
+
+La funcion calloc() reserva memoria para cualquier arreglo de nmemp elementos de tamanio size bytes cada uno
+y devuelve un puntero al inicio de la memoria reservada. Toda la memoria se setea con ceros. Si el valor de size es
+0, esta puede devolver NULL o un valor a un puntero unico que posteriormente podra ser pasado a la funcion free()
+para ser liberado. El producto de nmem y size determinan el tamanio del bloque de memoria reservado.
+
+La funcion realloc() modifica el tamano del bloque de memoria apuntado por ptr en size bytes. El contenido del
+bloque de memoria permanecera sin cambios desde el inicio del mismo hasta el mınino entre el viejo y nuevo tamano.
+Si el nuevo tamano del bloque es mayor que el tamano anterior, la memoria anadida no se encuentra inicializada en
+ningun valor. Si ptr es NULL, entonces la llamada es equivalente a malloc(size) para cualquier valor de size. Si size
+es cero y ptr no es NULL entonces la llamada es equivalente a free(ptr).
+
+PDF n°1 ejemplos de aritmetica de punteros
+
+Un puntero a una funcion no es mas que la direccion de memoria donde reside una determinada funcion en un
+programa en C. Ademas permite ejecutar a la funcion desde cualquier parte del programa. Los punteros a funciones
+en C pueden:
+1. ser elementos de un vector.
+2. ser pasados como parametros a una funcion.
+3. ser devueltos por una funcion
+Ej 
+void lista_con_cada_elemento(lista_t* lista, void (*funcion)(void*, void*), void *contexto){
+    if(!lista)
+        return;
+    
+    lista_iterador_t* it = lista_iterador_crear(lista);
+    if(!it)
+        return;
+
+    while(lista_iterador_tiene_siguiente(it)){
+        funcion(lista_iterador_siguiente(it), contexto);
+    }
+    lista_iterador_destruir(it);
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Analisis de algoritmos
+
+Un algoritmo es una secuencia de pasos no ambiguos, que al ser ejecutados resuelven un problema. Una vez que se
+se ha analizado el problema, disenado el algoritmo, es necesario poder determinar cuantos recursos computacionales
+consume. Cuando se habla de recursos se refiere a tiempo o espacio que el mismo requiere para y en su ejecucion esto 
+es necesario ademas para poder comparar los algoritmos entre ellos.
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Recursividad
+
+Una gran mayorıa de algoritmos utiles son recursivas. Esto quiere decir que para resolver un problema determinado,
+ellos se llaman a sı mismos. Existen varios tipos de recursividad:
+Recursividad Directa
+Recursividad Indirecta
+Recursividad de Cola
+La recursividad es una caracterıstica de ciertos problemas los cuales son resolubles mediante la solucion de una
+nueva instancia del mismo problema. En informatica la recursividad esta fuertemente asociada a las funciones y a
+los tipos de datos. En este apunte se estudia su relacion con la Implementacion de las funciones recursivas. Se dice
+que una funcion es recursiva si en el cuerpo de la funcion hay una llamada a sı misma.
+
+Una funcion recursiva necesita 2 cosas, la llamada recursiva y la condicion de corte.
+
+Cuando un programa pasa de estar almacenado en disco a ser ejecutado, el mismo es cargado en memoria y
+estructurado en cuatro partes (.code, .data, .heap y .stack). Una de estas partes, el stack, es la encargada de
+mantener el estado de como se van llamando las funciones y cual es la funcion que se esta ejecutando en un
+determinado instante tk. El stack cumple sus funciones de forma automatica y es independiente del programador.
+Esta parte parte del programa mantiene los dartos de las funciones en ejecucion justamente como lo hace el tda que
+lleva su nombre Pila o Stack. Por ende, el stack de ejecucion de un programa es una estructura de datos de la cual
+unicamente se puede obtener informacion de su tope.
+El ambito de una funcion no es nada mas que uma porcion de memoria. que se crea cuando la funcion es llamada
+y se destruye cuando la funcion termina su ejecuicion. Dentro del stack se almacenan:
+los argumentos que son pasados a la funcion.
+todas las variables locales declaradas en la funcion
+
+Se dice que una funcion usa recursividad directa, si la misma se llama a sı misma. Por otro lado existe otra forma
+de recursividad, la recursividad indirecta, que se da cuando una funcion f llama a una funcion g, la funcion g llama
+a la funcion g y ası sucesivamente... 
+
+Es una tecnica para optimizar la recursividad eliminando las constantes llamadas recursivas. Cuando se realiza
+una llamada recursiva se genera un ambito nuevo por cada llamada, este ambito se traduce en el stack de ejecucion
+como un stack frame, es decir, un ambito es equivalente a un stack frame, en la pila de ejecucion.
+Tail recursion se da cuando la llamada recursiva es la ultima instruccion de la funcion. Sin embargo, las funciones
+tail recursive deben cumplir la condicion que en la parte que realiza la llamada a la funcion, no debe existir ninguna
+otra instruccion.
+Una ventaja de la recursividad por cola es que se puede evitar la sobrecarga de cada llamada a la funcion y se evita
+el gasto de memoria de pila. Con una funcion tail recursive se puede evitar lo que se conoce como stack overflow,
+que ocurre cuando la pila de llamadas (call stack) consume mucha memoria.
+
+El metodo de divide y conquista esta compuesto de tres fases:
+1. Dividir: el problema en un numero de sub-problemas que sean instancias menores del mismo problema. Es decir,
+si el tamano de la entrada es n, hay que conseguir dividir el problema en k subproblemas (donde 1 < k < n),
+cada uno con una entrada de tamano nk y donde 0 < nk < n.
+2. Conquistar: los subproblemas de modo tal que sean resueltos recursivamente. si el tamano del subproblema eslos
+suficientemente pequeno la solucion es simple.El hecho de que el tamano de los subproblemas sea estrictamente
+menor que el tamano original del problema nos garantiza la convergencia hacia los casos elementales, tambien
+denominados casos base.
+3. Combinar: las soluciones obtenidas de cada subproblema en la solucion del problema original.
+
+El BACKTRACKING es una ténica de resolución de problemas que explora recursivamente todas las soluciónes posibles.
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+TDA o tda
+
+Abstraccion proviene del latın abstracto y esta vinculado al verbo abstraer que significa: separar aisladamente
+en la mente las caracterısticas de un objeto o un hecho, dejando de prestar atencion al mundo sensible
+para enfocarse solo en el pensamiento
+
+Un Tipo de Dato Abstracto (TDA), segun Liskov y Zilles, define una clase de objetos abstractos los cuales estan
+completamente caracterizados por las operaciones que pueden realizarse sobre esos objetos. Esto quiere decir que un
+tipo de dato abstracto puede ser definido describiendo las operaciones caracterısticas para ese tipo. En otras palabras,
+un tipo de dato abstracto esta definido no solo por unaestructura de datos sino tambien por las operaciones que
+se define sobre esa estructura, es decir que son ambas cosas juntas.
+Cuando un programador hace uso de un Tipo de Dato Abstracto (TDA), este se interesa unicamente en el
+comportamiento que tal objeto exhibe y no en los infinitos detalles de como se llego a su Implementacion. Mas
+precisamente la vision de aquel que utiliza un TDA es exclusivamente de Caja Negra. El comportamiento de un
+TDA es capturado por el conjunto operaciones caracterısticas o primitivas. Cualquier dSu desventaja es que no es un algoritmo de ordenamiento estable, es decir no preserva su orden relativo si la
+cantidad de claves se duplica
+Los TDA deben tender a parecerse a un tipo de dato primitivo provisto por el lenguaje de programacion. Uno
+usa variables de tipo entero y no se pregunta como la computadora implementa internamente ese tipo, utiliza sus
+operaciones caracterısticas o primitivas como la suma, division entera, resto, multiplicacion, resta y resto de la division
+entera. En el caso de los TDAs el programador (usuario) esta haciendo uso del concepto o abstraccion que logra
+el TDA en un determinado nivel, pero no de los detalles de bajo nivel de como se realizan (implementacion del
+complemento a 2).
+Una importante implicacion del uso de un tipo de datos abstracto, es que la mayorıa (por no decir todas) las
+operaciones que se utilizan en un programa de un determinado tda pertenecen al set de operaciones caracterısticas
+o primitivas del mismo.
+
+Las visiones de caja negra y caja blanca, hacen una importante diferencia:
+El Que: cuando se habla del que se esta haciendo referencia al concepto de funcionalidad. La funcionalidad
+esta estrechamente relacionado a la pregunta ¿Que hace esto? Es el concepto de caja negra.
+El Como: cuando se hace referencia al como se esta hablando de la forma en que algo esta disenado o
+implementado. Cuando se habla de diseno o implementacion se esta haciendo referencia a la estructura interna
+o a la forma en la cual la funcionalidad de algo es llevada a cabo. Por ello esta estrechamente ligado a la
+pregunta de ¿como lo hago? Concepto de caja blanca.
+
+Desarrollo
+
+Los programas y las bibliotecas que se construyen en lenguaje C forman parte del concepto de Software. La
+definicion de este concepto es muy variada:
+Es el conjunto de los programas de computo, procedimientos, reglas, documentacion y datos asociados, que
+forman parte de las operaciones de un sistema de computacion. (IEEE estandar 729).
+Es todo aquello que no es hardware.
+el software es toda la informacion procesada por los sistemas informaticos: programas y datos.
+El software no se fabrica, el software se desarrolla. El desarrollo de software no es una unica tarea sino que
+incluye a un conjunto de etapas, muy parecidas a las utilizadas para la resolucion de problemas computacionales.
+Este conjunto como mınimo debe comprender las siguientes tareas:
+Analisis: en esta etapa el foco se pone en la comprension del problema, determinar cuales son aquellas cosas
+que se requieren para la resolucion del mismo, etc. El analisis esta muy ligado a ¿Que es lo que hay que hacer?.
+poder responder a esa pregunta con claridad es un avance importante dentro del proceso de desarrollo.
+Diseno: La etapa del diseno se basa en el el proceso de crear una solucion teniendo en cuenta multiples aspectos
+del software y tambien del hardware sobre el cual se va a ejecutar el software que esta siendo disenado. El
+diseno pone su interes en el Como. Esta muy relacionado con el problema, el usuario y la solucion.
+Implementacion: Esta etapa es la mas conocida por los programadores pues es la etapa en la que a partir de
+un analisis acabado del problema, de los algoritmos a ser utilizados, las estructuras de datos, etc. se desarrolla
+el software.
+Pruebas: No puede haber software andando si previamente a su distribucion este no ha sufrido una serie de
+baterıas de pruebas para asegurarse, que por lo menos, lo que ha sido probado funcione.
+Instalacion: Esta etapa se basa en hacer que el software este andando.
+Mantenimiento: Como el software no es un producto que una vez acabado no sea susceptible al cambio, a
+arreglos, a mejoras o incluso a reparacion. La etapa de mantenimiento justamente se ocupa de esto.
+
+Ventajas
+Los tdas son la herramienta perfecta para manejar la abstraccion. La abstraccion permite simplificar la realidad
+mediante el despojo de complejidad que no es inherente al problema en estudio. Es mas los tdas permiten crear
+niveles de abstraccion basandose en construir tdas nuevos usando tipos primitivos y otros tdas.
+
+Es la propiedad por el cual un tda debe exponer la menor cantidad posible de informacion del como esta implementado, 
+y debe por ende hacer que el usuario del tda se base en las funciones que el mismo entiende. El implementador
+de un tda debe poder ocultar la mayor cantidad de detalles sobre la implemntacion y el diseno del mismo.
+
+Cuando existe un error dentro de un programa es mucho mas facil detectarlo pues la utilizacion de los tdas fuerza
+la modularizacion
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Arbol
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Arbol rojo y negro:
+
+Todo nodo es o bien rojo o bien negro.
+La raız es negra.
+Todas las hojas (NULL) son negras.
+Todo nodo rojo debe tener dos nodos hijos negros. No hay dos nodos rojos adyacentes.
+Cualquier camino desde un nodo dado a sus hojas descendientes contiene el mismo numero de nodos negros.
+
+Insercion = O(log n)
+Borrado = O(log n)
+
+Los nodos a ingresar son siempre rojos.
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Arboles B:
+Es un arbol enario de busqueda.
+Se caracterizan por ser de busqueda, equilibrados y de minima altura.
+Son buenos con grandes cantidades de datos.
+Todas sus ramas tienen las misma altura.
+Tienen una cantidad minima de claves por hoja (excepto la raiz)
+Siempre se inserta en hojas.
+
+cada nodo de un arbol B tiene n ramas y n-1 claves.
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+B*
+Al insertar, cuando la hoja esta llena, intenta ubicar el elemento en hojas hermanas para evitar divisiones.
+B+
+Cada hoja ademas tiene un puntero a su hermano para facilitar el recorrido, todas las claves se encuentran 
+en las hojas(se repiten), las claves se borran de las hojas, pero no de los padres, al estar ordenados no 
+se producen incosistencias.
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+SORTS
+
+Si el archivo que tiene que ser ordenado cabe completamente en la memoria, entonces el metodo de ordenamiento sera denominado ordenamiento interno. Si el archivo esta en disco o en memoria secundaria el
+metodo se denomina ordenamiento externo. La principal deferencia entre estos dos metodos es que en un
+metodo de ordenamiento interno cualquier ıtem puede ser accedido facilmente, mientras que en un metodo de
+ordenamiento externo es accedido secuencialmente o por lo menos en grandes bloques.
+
+• No Adaptativos si solo usan operaciones de comparacion o intercambio por ejemplo el metodo de
+insercion; la secuencia de operaciones que realizan es independiente del orden de los datos.
+• Adaptativo es aquel que realiza diferentes secuencias de operaciones dependiendo de las salidas de las
+comparaciones.
+
+Algoritmos de Ordenamiento Comparativos
+
+Quicksort (Peor de los casos pivote es el mayor o menor de todos los elementos O(n cuadrado) sino en el caso promedio su complejdoad es O(n log n)).
+Su desventaja es que no es un algoritmo de ordenamiento estable, es decir no preserva su orden relativo si la
+cantidad de claves se duplica
+
+Merge Sort (Su implementacio normal es O(n log n) pero reserva mucha memoria puede empeorar el rendimiento).
+El Merge inplace no usa memoria extra pero su complejidad es O(N cuadrado).
+
+
+Algoritmos de Ordenamiento No Comparativos
+
+Bucket Sort
+Su complejidad en el peor de los casos es de O(N cuadrado)
+1. Se crean N buckest vacıos
+2. Recorrer el arreglo original poniendo el elemento correspondiente en el bucket que lo debe contener.
+3. ordenar cada bucket que no este vacio.
+4. Visitar los buckets en orden y poner todos los elementos nuevamente en el arreglo.
+
+Radix Sort
+Este es otro metodo de ordenamiento no comparativo, que sirve para ordenar numeros ya que estos pueden
+representarse como cadenas de strings. La idea detras de del metodo es agrupar los numeros segun el valor de sus
+dıgitos. Esto puede hacerse con el dıgito menos significativo o el digito mas significativo. 
+El Algoritmo se implementara partiendo del digito mas significativo al mas significativo.
+Se realiza ordena el arreglo teniendo unicamente el primer digito menos significativo.
+Se realiza ordena el arreglo teniendo unicamente el segundo digito menos significativo.
+Se realiza ordena el arreglo teniendo unicamente el digito mas significativo.
