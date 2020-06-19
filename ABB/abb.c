@@ -10,6 +10,7 @@
 #define DERECHA 1
 #define COINCIDENCIA 0
 #define VACIO 0
+#define ENCONTRO -2
 ////////////////////////////////////////////////////////LLAMADAS A FUNCIONES EXTRA////////////////////////////////////////////////////////////
 nodo_abb_t* crear_nodo(void* elemento);
 int insertar_nodo(abb_t* arbol, nodo_abb_t* raiz, void* elemento, int posicion);
@@ -18,20 +19,20 @@ nodo_abb_t** buscar_nodo(nodo_abb_t** puntero_a_nodo, void* elemento, abb_compar
 ////////////////////////////////////////////////////////FUNCIONES BASICAS DEL ARBOL///////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////CREAR ARBOL///////////////////////////////////////////////////////////////////////
 abb_t* arbol_crear(abb_comparador comparador, abb_liberar_elemento destructor){
-    abb_t* arbol = malloc(sizeof(abb_t));
-    if(!arbol)
-        return NULL;
-
+    abb_t* arbol = NULL;
+    if(comparador){
+        arbol = malloc(sizeof(abb_t));
+        if(!arbol)
+            return NULL;
+    
     arbol->nodo_raiz = NULL;
     arbol->destructor = destructor;
     arbol->comparador = comparador;
+    }
     return arbol;
 }
 ///////////////////////////////////////////////////////INSERTAR EN ARBOL//////////////////////////////////////////////////////////////////////
 int arbol_insertar_recursivo(abb_t* arbol, nodo_abb_t* raiz, void* elemento){
-    if(!arbol->comparador) 
-        return ERROR;
-
     int comparador = arbol->comparador(elemento, raiz->elemento);
     if(comparador >= COINCIDENCIA){
         if(!raiz->derecha){
@@ -60,7 +61,7 @@ int arbol_insertar(abb_t* arbol, void* elemento){
     return arbol_insertar_recursivo(arbol, arbol->nodo_raiz, elemento);
 }
 /////////////////////////////////////////////////////////BORRAR EN ARBOL///////////////////////////////////////////////////////////////////////
-int borrar_recursivo(nodo_abb_t** puntero_a_nodo, abb_liberar_elemento destructor){
+int borrar_recursivo(nodo_abb_t** puntero_a_nodo, abb_liberar_elemento destructor, void* verificador){
     if(!puntero_a_nodo)
         return ERROR;
 
@@ -74,40 +75,43 @@ int borrar_recursivo(nodo_abb_t** puntero_a_nodo, abb_liberar_elemento destructo
     }else{ //2 HIJOS
         auxiliar = (*puntero_a_nodo)->izquierda;
         if(!auxiliar->derecha){
-            borrar_recursivo(&(*puntero_a_nodo)->izquierda, NULL); //Paso NULL como destructor porque no busco en realidad destruir el elemento, sino borrar los restos del nodo que voy a mover.
+            borrar_recursivo(&(*puntero_a_nodo)->izquierda, NULL, NULL); //Paso NULL como destructor porque no busco en realidad destruir el elemento, sino borrar los restos del nodo que voy a mover.
         }else{
             while((auxiliar->derecha)->derecha != NULL){
                 auxiliar = auxiliar->derecha;
             }
             nodo_abb_t* nodo_obj = auxiliar->derecha;
-            borrar_recursivo(&auxiliar->derecha, NULL); //Paso NULL como destructor porque no busco en realidad destruir el elemento, sino borrar los restos del nodo que voy a mover.
+            borrar_recursivo(&auxiliar->derecha, NULL, NULL); //Paso NULL como destructor porque no busco en realidad destruir el elemento, sino borrar los restos del nodo que voy a mover.
             auxiliar = nodo_obj;
         }
         auxiliar->derecha = (*puntero_a_nodo)->derecha;
         auxiliar->izquierda = (*puntero_a_nodo)->izquierda;
     }
-    if(destructor)
+    if(verificador){
         destruir_nodo(*puntero_a_nodo, destructor);
-
+    }
     *puntero_a_nodo = auxiliar;
     return EXITO;
 }
 
 int arbol_borrar(abb_t* arbol, void* elemento){
-    if(arbol_vacio(arbol) || !arbol->comparador || !arbol->destructor)
+    if(arbol_vacio(arbol))
         return ERROR;
+
+    int basura = VACIO;
+    void* verificador = &basura; //Tuve que agregar esto, ya que cuando pense la implementacion me olvide los casos en que se use el arbol con datos simples
+                                 //ya que usaba en la implementancion destructor NULL en los llamados recursivos para indicar que no debia borrarse,
+                                 //con esta modificacion uso este puntero extra para saber cuando en verdad quiero borrar o cuando solo
+                                 //borro en nodo pero no quiero liberarlos elementos. 
 
     nodo_abb_t** puntero_a_nodo = buscar_nodo(&arbol->nodo_raiz, elemento,arbol->comparador);
     if(!puntero_a_nodo)
         return ERROR;
 
-    return borrar_recursivo(puntero_a_nodo, arbol->destructor);
+    return borrar_recursivo(puntero_a_nodo, arbol->destructor, verificador);  
 }
 ////////////////////////////////////////////////////////BUSCAR EN EL ARBOL///////////////////////////////////////////////////////////////////////
 void* buscar_recursivo(abb_t* arbol, nodo_abb_t* raiz, void* elemento){
-    if(!arbol->comparador) 
-        return NULL;
-    
     int comparador = arbol->comparador(elemento, raiz->elemento);
     if(comparador == COINCIDENCIA)
         return raiz->elemento;
@@ -247,35 +251,48 @@ void arbol_destruir(abb_t* arbol){
     free(arbol);
 }
 //////////////////////////////////////////////////////ARBOL ITERADOR INTERNO//////////////////////////////////////////////////////////////////////
-void inorden_recursivo_iterador(nodo_abb_t* nodo, bool (*funcion)(void*, void*), void* extra){
+int inorden_recursivo_iterador(nodo_abb_t* nodo, bool (*funcion)(void*, void*), void* extra){
     if(!nodo)
-        return;
+        return ERROR;
 
-    inorden_recursivo_iterador(nodo->izquierda, funcion, extra);
+    if(inorden_recursivo_iterador(nodo->izquierda, funcion, extra) == ENCONTRO)
+        return ENCONTRO;
+
     if(funcion(nodo->elemento, extra))
-        return;
+        return ENCONTRO;
 
-    inorden_recursivo_iterador(nodo->derecha, funcion, extra);
+    if(inorden_recursivo_iterador(nodo->derecha, funcion, extra) == ENCONTRO)
+        return ENCONTRO;
+
+    return ERROR;
 }
 
-void postorden_recursivo_iterador(nodo_abb_t* nodo, bool (*funcion)(void*, void*), void* extra){
+int postorden_recursivo_iterador(nodo_abb_t* nodo, bool (*funcion)(void*, void*), void* extra){
     if(!nodo)
-        return;
+        return ERROR;
 
-    postorden_recursivo_iterador(nodo->izquierda, funcion, extra);
-    postorden_recursivo_iterador(nodo->derecha, funcion, extra);
+    if(postorden_recursivo_iterador(nodo->izquierda, funcion, extra) == ENCONTRO)
+        return ENCONTRO;
+    if(postorden_recursivo_iterador(nodo->derecha, funcion, extra) == ENCONTRO)
+        return ENCONTRO;
     if(funcion(nodo->elemento, extra))
-        return;
+        return ENCONTRO;
+
+    return ERROR;
 }
 
-void preorden_recursivo_iterador(nodo_abb_t* nodo, bool (*funcion)(void*, void*), void* extra){
+int preorden_recursivo_iterador(nodo_abb_t* nodo, bool (*funcion)(void*, void*), void* extra){
     if(!nodo)
-        return;
+        return ERROR;
 
     if(funcion(nodo->elemento, extra))
-        return;
-    preorden_recursivo_iterador(nodo->izquierda, funcion, extra);
-    preorden_recursivo_iterador(nodo->derecha, funcion, extra);
+        return ENCONTRO;
+    if(preorden_recursivo_iterador(nodo->izquierda, funcion, extra) == ENCONTRO)
+        return ENCONTRO;
+    if(preorden_recursivo_iterador(nodo->derecha, funcion, extra) == ENCONTRO)
+        return ENCONTRO;
+    
+    return ERROR;
 }
 
 void abb_con_cada_elemento(abb_t* arbol, int recorrido, bool (*funcion)(void*, void*), void* extra){

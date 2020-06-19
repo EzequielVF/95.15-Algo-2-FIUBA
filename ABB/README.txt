@@ -1,8 +1,8 @@
 ------------------------------------README------------------------------------------------
 ------------------------------------------------------------------------------------------
-El trabajo es basicamente un TDA o tipo de dato abstracto elaborado con nodos, que permite
-almacenar varios elementos (el limite es la cantidad de memoria disponible) ademas de facil
-acceso a los mismos una ves guardados.
+El trabajo es basicamente un TDA o tipo de dato abstracto elaborado con nodos en formal de 
+"arbol", que permite almacenar varios elementos (el limite es la cantidad de memoria 
+disponible) ademas de facil acceso a los mismos una ves guardados.
 ------------------------------------------------------------------------------------------
 --------------------------------LINEA DE COMPILACION--------------------------------------
 Para utilizar esta implementacion sera igual al uso de bibliotecas de la libreria estandar

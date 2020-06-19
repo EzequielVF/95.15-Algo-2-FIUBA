@@ -316,18 +316,10 @@ void pruebas_con_arbol_null(pa2m_t* probador){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void pruebas_comparador_null(pa2m_t* probador){
 	abb_t* arbol = arbol_crear(NULL, destructor_de_cosas);
-	cosa_t* c4= crear_cosa(4);
-	cosa_t* c5= crear_cosa(5);
-	
 	printf("*********************************************\n");
     pa2m_avisar("Pruebas con comparador NULL");
     printf("*********************************************\n");
-	pa2m_asegurar(probador, "Arbol inserta correctamente:", arbol_insertar(arbol, c4) == 0);
-	pa2m_asegurar(probador, "Al insertar sin comparador tira error:", arbol_insertar(arbol, c5) == -1);
-	pa2m_asegurar(probador, "Al buscar sin comparador devuelve NULL:", arbol_buscar(arbol, c4) == NULL);
-	pa2m_asegurar(probador, "Al borrar sin comparador tira error:", arbol_borrar(arbol, c4) == -1);
-	destructor_de_cosas(c5);
-	arbol_destruir(arbol);
+	pa2m_asegurar(probador, "Arbol sin comparador es NULL", arbol == NULL);
 	printf("*********************************************\n");
     pa2m_mostrar_estadisticas(probador);
     printf("*********************************************\n");
@@ -335,18 +327,17 @@ void pruebas_comparador_null(pa2m_t* probador){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void pruebas_destructor_null(pa2m_t* probador){
 	abb_t* arbol = arbol_crear(comparar_cosas, NULL);
-	cosa_t* c4= crear_cosa(4);
-	cosa_t* c5= crear_cosa(5);
+	int c4= 4;
+	int c5= 5;
 	
 	printf("*********************************************\n");
     pa2m_avisar("Pruebas con destructor NULL");
     printf("*********************************************\n");
-	pa2m_asegurar(probador, "Arbol inserta correctamente:", arbol_insertar(arbol, c4) == 0);
-	pa2m_asegurar(probador, "Arbol inserta correctamente:", arbol_insertar(arbol, c5) == 0);
-	pa2m_asegurar(probador, "Al borrar sin destructor tira error:", arbol_borrar(arbol, c4) == -1);
+	pa2m_asegurar(probador, "Arbol inserta correctamente:", arbol_insertar(arbol, &c4) == 0);
+	pa2m_asegurar(probador, "Arbol inserta correctamente:", arbol_insertar(arbol, &c5) == 0);
+	pa2m_asegurar(probador, "Borra el nodo aunque no haya destructor:", arbol_borrar(arbol, &c4) == 0);
+	pa2m_asegurar(probador, "Borra el nodo aunque no haya destructor:", arbol_borrar(arbol, &c5) == 0);
 	arbol_destruir(arbol);
-	destructor_de_cosas(c4);
-	destructor_de_cosas(c5);
 	printf("*********************************************\n");
     pa2m_mostrar_estadisticas(probador);
     printf("*********************************************\n");
