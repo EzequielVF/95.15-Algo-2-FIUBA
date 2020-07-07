@@ -130,4 +130,6 @@ void arbol_destruir(abb_t* arbol);
 */
 void abb_con_cada_elemento(abb_t* arbol, int recorrido, bool (*funcion)(void*, void*), void* extra);
 
+int insertar_en_lista_del_elemento(abb_t* arbol, void* elemento, int (*funcion)(void*, void*), void* elemento2);
+
 #endif /* __ARBOL_BINARIO_DE_BUSQUEDA_H__ */

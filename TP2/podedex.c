@@ -37,6 +37,14 @@ particular_pokemon_t* crear_pokemon(char* nombre, int nivel, char capturado){
     return aux;
 }
 
+int insertar_en_lista_de_especie(void* especie, void* pokemon){
+    if(!especie || !pokemon)
+		return ERROR;
+
+    lista_insertar(((especie_pokemon_t*)especie)->pokemones, pokemon);
+    return EXITO;
+}
+
 int comparar_cosas(void* elemento1, void* elemento2){
 	if(!elemento1 || !elemento2)
 		return 0;
@@ -77,10 +85,6 @@ pokedex_t* pokedex_crear(char entrenador[MAX_NOMBRE]){
     return pokedex;
 }
 /////////////////////////////////////////////////////////POKEDEX AVISTAR////////////////////////////////////////////////////////////////////
-int insertar_pokemon_en_especie(abb_t* arbol,  especie_pokemon_t* especie, particular_pokemon_t* pokemon){
-
-}
-
 int pokedex_avistar(pokedex_t* pokedex, char ruta_archivo[MAX_RUTA]){
     if(!pokedex)
         return ERROR;
@@ -91,11 +95,13 @@ int pokedex_avistar(pokedex_t* pokedex, char ruta_archivo[MAX_RUTA]){
     
     especie_pokemon_t* especie_leida;
     particular_pokemon_t* pokemon_leido;
-    bool colocado = false;
-    bool especie_conocida = false;
     bool problemas_lectura = false;
+    bool inserto_pokemon = false;
+    bool inserto_en_pila = false;
+    bool inserto_en_cola = false;
+    bool problemas_insercion = false;
     int leido = 0;
-    int estado = 0;
+    int estado = EXITO;
     int numero_especie = 0;
     int comparador = 0;
     int nivel_pokemon = 0;
@@ -107,28 +113,56 @@ int pokedex_avistar(pokedex_t* pokedex, char ruta_archivo[MAX_RUTA]){
     leido = fscanf(avistamientostxt, FORMATO_LECTURA_AVISTAMIENTOS, &numero_especie, nombre_especie, descripcion_especie, nombre_pokemon, &nivel_pokemon, &capturado);
     if(leido != PARAMETROS_LEIDOS){
         problemas_lectura = true;
-    }
-    if(problemas_lectura){
         fclose(avistamientostxt);
         return ERROR;
     }
-    especie_leida = crear_especie(numero_especie, nombre_especie, descripcion_especie);
-    pokemon_leido = crear_pokemon(nombre_pokemon, nivel_pokemon, capturado);
-    
-    if(pokedex->pokemones == NULL){
+    while(leido = PARAMETROS_LEIDOS && !problemas_lectura && !problemas_insercion){
+        especie_leida = crear_especie(numero_especie, nombre_especie, descripcion_especie);
+        pokemon_leido = crear_pokemon(nombre_pokemon, nivel_pokemon, capturado);
+
+        if(pokedex->pokemones == NULL){
         pokedex->pokemones = arbol_crear(comparar_cosas, destructor_de_cosas);
-    }
-    if(pokedex->ultimos_capturados == NULL){
-        pokedex->ultimos_capturados = lista_crear();
-    }
-    if(pokedex->ultimos_vistos == NULL){
-        pokedex->ultimos_vistos = lista_crear();
+        }
+        if(pokedex->ultimos_capturados == NULL){
+        pokedex->ultimos_capturados = lista_crear(); ///ESTO UNA PILA
+        }
+        if(pokedex->ultimos_vistos == NULL){
+        pokedex->ultimos_vistos = lista_crear(); ///ESTO ES UNA COLA
+        }
+
+        if((especie_pokemon_t*)arbol_buscar(pokedex->pokemones, especie_leida) == NULL){ ///INSERTO LA ESPECIE EN EL ARBOL SI NO ESTA
+            arbol_insertar(pokedex->pokemones, especie_leida);
+        }
+
+        if(insertar_en_lista_del_elemento(pokedex->pokemones, especie_leida, insertar_en_lista_de_especie, pokemon_leido) == EXITO){ ///INSERTO EL POKEMON DENTRO DE LA ESPECIE
+            inserto_pokemon = true;
+        }
+
+        if(lista_encolar(pokedex->ultimos_vistos, pokemon_leido) == EXITO){ ///INSERTO POKEMON EN LA COLA DE VISTOS
+            inserto_en_cola = true;
+        }
+        if(pokemon_leido->capturado == 'S'){
+            if(lista_apilar(pokedex->ultimos_capturados, pokemon_leido) == EXITO){ /// INSERTO POKEMON EN LA PILA DE CAPTURADOS
+                inserto_en_pila = true;
+            }
+        }
+        if(!inserto_en_cola || !inserto_en_pila || !inserto_pokemon) ///VERIFICO QUE TODO FUNCIONO
+            problemas_insercion = true;
+
+        leido = fscanf(avistamientostxt, FORMATO_LECTURA_AVISTAMIENTOS, &numero_especie, nombre_especie, descripcion_especie, nombre_pokemon, &nivel_pokemon, &capturado); /// VUELVO A LEER
+        if(leido != PARAMETROS_LEIDOS){
+            problemas_lectura = true;
+            fclose(avistamientostxt);
+        }
     }
 
-    if((especie_pokemon_t*)arbol_buscar(pokedex->pokemones, especie_leida) == NULL){
-        arbol_insertar(pokedex->pokemones, especie_leida);
+    fclose(avistamientostxt);
+
+    if(!inserto_en_cola || !inserto_en_pila || !inserto_pokemon){
+        estado = ERROR;
     }
 
+    return estado;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

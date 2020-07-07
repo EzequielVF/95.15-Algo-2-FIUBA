@@ -360,3 +360,30 @@ nodo_abb_t** buscar_nodo(nodo_abb_t** puntero_a_nodo, void* elemento, abb_compar
     }
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int insertar_en_lista_del_elemento_r(abb_t* arbol, nodo_abb_t* raiz, void* elemento, int (*funcion)(void*, void*), void* elemento2){
+    int comparador = arbol->comparador(elemento, raiz->elemento);
+    if(comparador == COINCIDENCIA){
+        return funcion(raiz->elemento, elemento2);
+    }
+    
+    if(comparador > COINCIDENCIA){
+        if(!raiz->derecha)
+            return NULL;
+
+        return insertar_en_lista_del_elemento_r(arbol, raiz->derecha, elemento, funcion, elemento2);
+    }
+    if(comparador < COINCIDENCIA){
+        if(!raiz->izquierda)
+            return NULL;
+
+        return insertar_en_lista_del_elemento_r(arbol, raiz->izquierda, elemento, funcion, elemento2);
+    }
+    return NULL;
+}
+
+int insertar_en_lista_del_elemento(abb_t* arbol, void* elemento, int (*funcion)(void*, void*), void* elemento2){
+    if(arbol_vacio(arbol))
+        return NULL;
+
+    return insertar_en_lista_del_elemento_r(arbol, arbol->nodo_raiz, elemento, funcion, elemento2);
+}
