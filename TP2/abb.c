@@ -368,22 +368,22 @@ int insertar_en_lista_del_elemento_r(abb_t* arbol, nodo_abb_t* raiz, void* eleme
     
     if(comparador > COINCIDENCIA){
         if(!raiz->derecha)
-            return NULL;
+            return ERROR;
 
         return insertar_en_lista_del_elemento_r(arbol, raiz->derecha, elemento, funcion, elemento2);
     }
     if(comparador < COINCIDENCIA){
         if(!raiz->izquierda)
-            return NULL;
+            return ERROR;
 
         return insertar_en_lista_del_elemento_r(arbol, raiz->izquierda, elemento, funcion, elemento2);
     }
-    return NULL;
+    return ERROR;
 }
 
 int insertar_en_lista_del_elemento(abb_t* arbol, void* elemento, int (*funcion)(void*, void*), void* elemento2){
     if(arbol_vacio(arbol))
-        return NULL;
+        return ERROR;
 
     return insertar_en_lista_del_elemento_r(arbol, arbol->nodo_raiz, elemento, funcion, elemento2);
 }
