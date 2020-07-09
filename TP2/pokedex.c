@@ -110,7 +110,6 @@ void insertar_pokemon_en_especie(pokedex_t* pokedex, especie_pokemon_t* especie_
         lista_insertar(especie_en_pokedex->pokemones, pokemon_leido);
         lista_destruir(especie_leida->pokemones);
         free(especie_leida);
-        //*flag_liberar_especie = true;
         *inserto_pokemon = true;
     }
 }
@@ -136,19 +135,9 @@ int pokedex_avistar(pokedex_t* pokedex, char ruta_archivo[MAX_RUTA]){
         
     especie_pokemon_t* especie_leida;
     particular_pokemon_t* pokemon_leido;
-    bool problemas_lectura = false;
-    bool inserto_pokemon = false;
-    bool inserto_en_pila = false;
-    bool inserto_en_cola = false;
-    bool problemas_insercion = false;
-    int leido = 0;
-    int estado = EXITO;
-    int numero_especie = 0;
-    int nivel_pokemon = 0;
-    char nombre_especie[MAX_NOMBRE];
-    char descripcion_especie[MAX_DESCRIPCION];
-    char nombre_pokemon[MAX_NOMBRE];
-    char capturado = '0';
+    bool problemas_lectura = false, inserto_pokemon = false, inserto_en_pila = false, inserto_en_cola = false, problemas_insercion = false;
+    int leido = 0, estado = EXITO, numero_especie = 0, nivel_pokemon = 0;
+    char nombre_especie[MAX_NOMBRE], descripcion_especie[MAX_DESCRIPCION], nombre_pokemon[MAX_NOMBRE], capturado = '0';
 
     leer_avistamientos(&leido, &numero_especie, nombre_especie, descripcion_especie, nombre_pokemon, &nivel_pokemon, &capturado, avistamientostxt);
     if(leido != PARAMETROS_LEIDOS_AVISTAIENTOS){
@@ -180,8 +169,39 @@ void leer_evoluciones(int* leido, int* numero_especie_original, char* nombre_esp
     (*leido) = fscanf(evolucionestxt, FORMATO_LECTURA_EVOLUCIONES, numero_especie_original, nombre_pokemon, numero_especie_nueva, nombre_especie_nueva, descripcion_especie_nueva);
 }
 
-void buscar_pokemon_a_evolucionar(int numero_especie_base, char* nombre_pokemon, especie_pokemon_t* especie_en_pokedex, particular_pokemon_t* pokemon_aux, bool* pokemon_encontrado, size_t* i, size_t* posicion_pokemon){
-    
+particular_pokemon_t* buscar_pokemon_a_evolucionar(especie_pokemon_t* especie_en_pokedex, bool* pokemon_encontrado, size_t* posicion_pokemon, size_t* i, particular_pokemon_t pokemon_leido){
+    particular_pokemon_t* pokemon_aux;
+    size_t cantidad;
+    cantidad = lista_elementos(especie_en_pokedex->pokemones);
+    while((*i) < cantidad && !(*pokemon_encontrado)){
+        pokemon_aux = (particular_pokemon_t*)lista_elemento_en_posicion(especie_en_pokedex->pokemones, *i);
+        if(strcmp(pokemon_aux->nombre, pokemon_leido.nombre) == COINCIDENCIA){
+            if(pokemon_aux->capturado){
+                *pokemon_encontrado = true;
+                *posicion_pokemon = (*i);
+            }
+        }
+        (*i)++;
+    }
+    return pokemon_aux;
+}
+
+void mover_pokemon_de_especie_a_especie(pokedex_t* pokedex, especie_pokemon_t* especie_en_pokedex, particular_pokemon_t* pokemon_nuevo, especie_pokemon_t* especie_nueva, especie_pokemon_t* especie_a_evolucionar_en_pokedex, bool* inserto_pokemon, bool* problemas_asignacion, size_t posicion_pokemon){
+    if(!especie_a_evolucionar_en_pokedex){ ///INSERTO LA ESPECIE EN EL ARBOL SI NO ESTA
+        lista_insertar(especie_nueva->pokemones, pokemon_nuevo);
+        arbol_insertar(pokedex->pokemones, especie_nueva);
+        *inserto_pokemon = true;
+    }else{ ///LIBERO LA ESPECIE QUE CREE Y AGREGO EL POKEMON A LA UBICADA EN EL ARBOL
+        lista_insertar(especie_a_evolucionar_en_pokedex->pokemones, pokemon_nuevo);
+        lista_destruir(especie_nueva->pokemones);
+        free(especie_nueva);
+        *inserto_pokemon = true;
+    }
+    if(!(*inserto_pokemon)){
+        *problemas_asignacion = true;
+    }else{
+        lista_borrar_de_posicion(especie_en_pokedex->pokemones, posicion_pokemon);
+    } 
 }
 
 int pokedex_evolucionar(pokedex_t* pokedex, char ruta_archivo[MAX_RUTA]){
@@ -196,71 +216,35 @@ int pokedex_evolucionar(pokedex_t* pokedex, char ruta_archivo[MAX_RUTA]){
     especie_pokemon_t* especie_nueva;
     particular_pokemon_t* pokemon_nuevo;
     particular_pokemon_t* pokemon_aux;
-    int leido = 0;
-    int estado = EXITO;
-    int numero_especie_base = 0;
-    int numero_especie_nueva = 0;
-    size_t posicion_pokemon = 0;
-    size_t i = 0;
-    size_t cantidad = 0;
-    char nombre_especie_nueva[MAX_NOMBRE];
-    char descripcion_especie_nueva[MAX_DESCRIPCION];
-    char nombre_pokemon[MAX_NOMBRE];
-    bool pokemon_encontrado = false;
-    bool inserto_pokemon = false;
-    bool problemas_asignacion = false;
-    bool problemas_lectura = false;
+    int numero_especie_base = 0, numero_especie_nueva = 0, estado = EXITO, leido = 0;
+    size_t posicion_pokemon = 0, i = 0;
+    char nombre_especie_nueva[MAX_NOMBRE], descripcion_especie_nueva[MAX_DESCRIPCION], nombre_pokemon[MAX_NOMBRE];
+    bool pokemon_encontrado = false, inserto_pokemon = false, problemas_asignacion = false, problemas_lectura = false;
 
     leer_evoluciones(&leido, &numero_especie_base, nombre_especie_nueva, descripcion_especie_nueva, nombre_pokemon, &numero_especie_nueva, evolucionestxt);
     while(leido == PARAMETROS_LEIDOS_EVOLUCIONES && !problemas_lectura){
-        //buscar_pokemon_a_evolucionar(numero_especie_base, nombre_pokemon, especie_en_pokedex, pokemon_aux, &pokemon_encontrado, &i, &posicion_pokemon);
-        
         especie_base.numero = numero_especie_base;
         strcpy(pokemon_leido.nombre, nombre_pokemon);
         especie_en_pokedex = (especie_pokemon_t*)arbol_buscar(pokedex->pokemones, &especie_base);
         if(especie_en_pokedex){
-            cantidad = lista_elementos(especie_en_pokedex->pokemones);
-            while(i < cantidad && !pokemon_encontrado){
-                pokemon_aux = (particular_pokemon_t*)lista_elemento_en_posicion(especie_en_pokedex->pokemones, i);
-                if(strcmp(pokemon_aux->nombre, pokemon_leido.nombre) == COINCIDENCIA){
-                    if(pokemon_aux->capturado){
-                        pokemon_encontrado = true;
-                        posicion_pokemon = i;
-                    }
-                }
-                i++;
-            }
+            pokemon_aux = buscar_pokemon_a_evolucionar(especie_en_pokedex, &pokemon_encontrado, &posicion_pokemon, &i, pokemon_leido);
         }
         if(pokemon_encontrado){
             pokemon_nuevo = crear_pokemon(pokemon_aux->nombre, pokemon_aux->nivel, 'S');
             especie_nueva = crear_especie(numero_especie_nueva, nombre_especie_nueva, descripcion_especie_nueva);
             especie_a_evolucionar_en_pokedex = (especie_pokemon_t*)arbol_buscar(pokedex->pokemones, especie_nueva);
-            if(!especie_a_evolucionar_en_pokedex){ ///INSERTO LA ESPECIE EN EL ARBOL SI NO ESTA
-                lista_insertar(especie_nueva->pokemones, pokemon_nuevo);
-                arbol_insertar(pokedex->pokemones, especie_nueva);
-                inserto_pokemon = true;
-            }else{ ///LIBERO LA ESPECIE QUE CREE Y AGREGOEL POKEMON A LA UBICADA EN EL ARBOL
-                lista_insertar(especie_a_evolucionar_en_pokedex->pokemones, pokemon_nuevo);
-                lista_destruir(especie_nueva->pokemones);
-                free(especie_nueva);
-                inserto_pokemon = true;
-            }
-            if(!inserto_pokemon){
-                problemas_asignacion = true;
-            }else{
-                lista_borrar_de_posicion(especie_en_pokedex->pokemones, posicion_pokemon);
-            }    
+            mover_pokemon_de_especie_a_especie(pokedex, especie_en_pokedex, pokemon_nuevo, especie_nueva, especie_a_evolucionar_en_pokedex, &inserto_pokemon, &problemas_asignacion, posicion_pokemon);
         }
         inserto_pokemon = false;
         pokemon_encontrado = false;
         i = 0;
-        leer_evoluciones(&leido, &numero_especie_base, nombre_especie_nueva, descripcion_especie_nueva, nombre_pokemon, &numero_especie_nueva, evolucionestxt);
+        leer_evoluciones(&leido, &numero_especie_base, nombre_especie_nueva, descripcion_especie_nueva, nombre_pokemon, &numero_especie_nueva, evolucionestxt); ///VUELVO A LEER NUEVAMENTE
         if(leido != PARAMETROS_LEIDOS_EVOLUCIONES){
             problemas_lectura = true;
         }
     }
-    fclose(evolucionestxt);
-    if(problemas_asignacion) estado = ERROR;
+    fclose(evolucionestxt); //CIERRO EL ARCHIVO
+    if(problemas_asignacion) estado = ERROR; //ME FIJO SI HUBO ERRORES
 
     return estado;
 }
@@ -285,7 +269,7 @@ int main(){
             printf("%i-", (*(particular_pokemon_t*)lista_elemento_en_posicion(especies[i]->pokemones, j)).nivel);
         }
         printf("\n\n");
-    }/*
+    }
     for(size_t j=0;j<lista_elementos(pokedex->ultimos_vistos);j++){
             printf("%s-", (*(particular_pokemon_t*)lista_elemento_en_posicion(pokedex->ultimos_vistos, j)).nombre);
             printf("%i-", (*(particular_pokemon_t*)lista_elemento_en_posicion(pokedex->ultimos_vistos, j)).nivel);
@@ -294,9 +278,8 @@ int main(){
     for(size_t j=0;j<lista_elementos(pokedex->ultimos_capturados);j++){
             printf("%s-", (*(particular_pokemon_t*)lista_elemento_en_posicion(pokedex->ultimos_capturados, j)).nombre);
             printf("%i-", (*(particular_pokemon_t*)lista_elemento_en_posicion(pokedex->ultimos_capturados, j)).nivel);
-    }*/
+    }
 	printf("\n");
-    //printf("nada solo para mirar con gdb\n");
     if(pokedex_evolucionar(pokedex, "evoluciones.txt")== EXITO){
         printf("Perfecto\n");
     }
