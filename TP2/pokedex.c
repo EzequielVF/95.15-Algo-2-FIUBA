@@ -58,7 +58,19 @@ int comparar_cosas(void* elemento1, void* elemento2){
 }
 
 void destruir_cosa(especie_pokemon_t* elemento){
-	lista_destruir(elemento->pokemones);
+	size_t cantidad = lista_elementos(elemento->pokemones);
+    particular_pokemon_t* aux = NULL;
+
+    for(size_t i = cantidad; i > 0; i--){
+        aux = (particular_pokemon_t*)lista_elemento_en_posicion(elemento->pokemones, i);
+        lista_borrar_de_posicion(elemento->pokemones, i);
+        free(aux);
+    }
+    aux = (particular_pokemon_t*)lista_elemento_en_posicion(elemento->pokemones, 0);
+    lista_borrar_de_posicion(elemento->pokemones, 0);
+    free(aux);
+
+    lista_destruir(elemento->pokemones);
     free(elemento);
 }
 
@@ -77,8 +89,12 @@ pokedex_t* pokedex_crear(char entrenador[MAX_NOMBRE]){
     if(!pokedex)
         return NULL;
 
-    strcpy(pokedex->nombre_entrenador, entrenador);
-    pokedex->pokemones = NULL;
+    if(strlen(entrenador) > 0){
+        strcpy(pokedex->nombre_entrenador, entrenador);
+    }else{
+        strcpy(pokedex->nombre_entrenador, "unknown");
+    }
+    pokedex->pokemones = arbol_crear(comparar_cosas, destructor_de_cosas);
     pokedex->ultimos_capturados = NULL;
     pokedex->ultimos_vistos = NULL;
     return pokedex;
@@ -89,9 +105,6 @@ void leer_avistamientos(int* leido, int* numero_especie, char* nombre_especie, c
 }
 
 void revisar_estado_estructuras(pokedex_t* pokedex){
-    if(pokedex->pokemones == NULL){
-        pokedex->pokemones = arbol_crear(comparar_cosas, destructor_de_cosas);
-    }
     if(pokedex->ultimos_capturados == NULL){
         pokedex->ultimos_capturados = lista_crear(); ///ESTO UNA PILA
     }
@@ -251,6 +264,7 @@ int pokedex_evolucionar(pokedex_t* pokedex, char ruta_archivo[MAX_RUTA]){
 }
 /////////////////////////////////////////////////////////POKEDEX ULTIMOS CAPTURADOS////////////////////////////////////////////////////////////////////
 void pokedex_ultimos_capturados(pokedex_t* pokedex){
+    if(!pokedex) return;  
     size_t cantidad = lista_elementos(pokedex->ultimos_capturados);
     particular_pokemon_t* cosa = NULL;
     for(size_t i = (cantidad-1); i > 0; i--){
@@ -263,6 +277,7 @@ void pokedex_ultimos_capturados(pokedex_t* pokedex){
 }
 /////////////////////////////////////////////////////////POKEDEX ULTIMOS VISTOS////////////////////////////////////////////////////////////////////
 void pokedex_ultimos_vistos(pokedex_t* pokedex){
+    if(!pokedex) return;  
     size_t cantidad = lista_elementos(pokedex->ultimos_vistos);
     particular_pokemon_t* cosa = NULL;
     for(size_t i = 0; i < cantidad; i++){
@@ -277,7 +292,7 @@ void buscar_pokemon(bool* pokemon_encontrado, particular_pokemon_t* pokemon_en_p
     while(i < cantidad && !(*pokemon_encontrado)){
         pokemon_en_pokedex = (particular_pokemon_t*)lista_elemento_en_posicion(especie_en_pokedex->pokemones, i);
         if(strcmp(pokemon_en_pokedex->nombre, pokemon_leido.nombre) == COINCIDENCIA){
-            printf("%s-%i\n", pokemon_en_pokedex->nombre, pokemon_en_pokedex->nivel);
+            printf("%s-%s-%i\n", especie_en_pokedex->nombre, pokemon_en_pokedex->nombre, pokemon_en_pokedex->nivel);
             *pokemon_encontrado = true;
         }
         i++;
@@ -287,6 +302,7 @@ void buscar_pokemon(bool* pokemon_encontrado, particular_pokemon_t* pokemon_en_p
 void imprimir_pokemones_de_una_especie(bool* pokemon_encontrado, especie_pokemon_t* especie_en_pokedex){
     size_t i = 0, cantidad = lista_elementos(especie_en_pokedex->pokemones);
     particular_pokemon_t* cosa = NULL;
+    printf("%s:\n", especie_en_pokedex->nombre);
     for(i = 0; i < cantidad; i++){
         cosa = (particular_pokemon_t*)lista_elemento_en_posicion(especie_en_pokedex->pokemones, i);
         printf("%s-%i\n", cosa->nombre, cosa->nivel);
@@ -295,6 +311,7 @@ void imprimir_pokemones_de_una_especie(bool* pokemon_encontrado, especie_pokemon
 }
 /////////////////////////////////////////////////////////POKEDEX INFORMACION////////////////////////////////////////////////////////////////////
 void pokedex_informacion(pokedex_t* pokedex, int numero_pokemon, char nombre_pokemon[MAX_NOMBRE]){
+    if(!pokedex) return;  
     especie_pokemon_t especie_leida;
     particular_pokemon_t pokemon_leido;
     especie_pokemon_t* especie_en_pokedex = NULL;
@@ -319,20 +336,84 @@ void pokedex_informacion(pokedex_t* pokedex, int numero_pokemon, char nombre_pok
     }
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*int pokedex_apagar(pokedex_t* pokedex){
+bool escribir_elemento(void* elemento, void* extra){
+	FILE* pokedextxt = (FILE*)extra;
+	especie_pokemon_t* cosa = (especie_pokemon_t*)elemento;
+    particular_pokemon_t* pokemon = NULL;
+    char captura = 'a';
+    size_t cantidad = 0;
 
+	if(elemento){
+        fprintf(pokedextxt, "E;%s;%i;%s\n", cosa->nombre, cosa->numero, cosa->descripcion);
+        cantidad = lista_elementos(cosa->pokemones);
+        for(size_t i = 0; i < cantidad; i++){
+            pokemon = (particular_pokemon_t*)lista_elemento_en_posicion(cosa->pokemones, i);
+            if(pokemon->capturado){
+                captura = 'S';
+            }else{
+                captura = 'N';
+            }
+            fprintf(pokedextxt, "P;%s;%i;%c\n", pokemon->nombre, pokemon->nivel, captura);
+        }
+    }
+	return false;
+}
+
+int pokedex_apagar(pokedex_t* pokedex){
+    if(!pokedex) return ERROR;
+    FILE* pokedextxt = fopen("pokedex.txt", "w");
+    if(!pokedextxt) return ERROR;
+
+    fprintf(pokedextxt, "%s\n", pokedex->nombre_entrenador);
+    abb_con_cada_elemento(pokedex->pokemones, ABB_RECORRER_PREORDEN, escribir_elemento, pokedextxt);
+
+    fclose(pokedextxt);
+    return EXITO;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 pokedex_t* pokedex_prender(){
+    pokedex_t* aux;
+    especie_pokemon_t* especie_leida = NULL;
+    especie_pokemon_t* especie_en_pokedex = NULL;
+    particular_pokemon_t* pokemon_leido = NULL;
+    char especie[MAX_NOMBRE];
+    char pokemon[MAX_NOMBRE];
+    char descripcion_especie[MAX_NOMBRE];
+    char nombre[MAX_NOMBRE];
+    char letra_indice = 'a';
+    char capturado = 'a';
+    int numero_especie = 0;
+    int nivel_pokemon = 0;
+    int leido = 0;
 
-}*/
+    FILE* pokedextxt = fopen("pokedex.txt", "r");
+    if(!pokedextxt) return NULL;
+
+    fscanf(pokedextxt, "%[^\n]\n", nombre);
+    aux = pokedex_crear(nombre);
+    leido = fscanf(pokedextxt, "%c;", &letra_indice);
+    while(leido == 1){
+        if(letra_indice == 'E'){
+            fscanf(pokedextxt, "%[^;];%i;%[^\n]\n", especie, &numero_especie, descripcion_especie);
+            especie_leida = crear_especie(numero_especie, especie, descripcion_especie);
+            arbol_insertar(aux->pokemones, especie_leida);
+        }else{
+            fscanf(pokedextxt, "%[^;];%i;%c\n", pokemon, &nivel_pokemon, &capturado);
+            pokemon_leido = crear_pokemon(pokemon, nivel_pokemon, capturado);
+            especie_en_pokedex = (especie_pokemon_t*)arbol_buscar(aux->pokemones, especie_leida);
+            lista_insertar(especie_en_pokedex->pokemones, pokemon_leido);
+        }
+        leido = fscanf(pokedextxt, "%c;", &letra_indice);
+    }
+    return aux;
+}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void pokedex_destruir(pokedex_t* pokedex){
-
+    arbol_destruir(pokedex->pokemones);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int main(){
-    int cantidad;
+   /*int cantidad;
     especie_pokemon_t* especies[10];
     especie_pokemon_t* especies2[10];
     pokedex_t* pokedex = pokedex_crear("Ezequiel");
@@ -379,6 +460,20 @@ int main(){
     pokedex_ultimos_vistos(pokedex);
     printf("\n\n");
     pokedex_informacion(pokedex, 25, "");
+    pokedex_apagar(pokedex);*/
+    pokedex_t* pokedex = pokedex_prender();
+    int cantidad;
+    especie_pokemon_t* especies[12];
+    cantidad = arbol_recorrido_preorden(pokedex->pokemones, (void**)especies, 12);
+    for(int i=0;i<cantidad;i++){
+        printf("%i-", especies[i]->numero);
+        printf("Niveles de pokemones en la lista: ");
+        for(size_t j=0;j<lista_elementos(especies[i]->pokemones);j++){
+            printf("%i-", (*(particular_pokemon_t*)lista_elemento_en_posicion(especies[i]->pokemones, j)).nivel);
+        }
+        printf("\n\n");
+    }
+    pokedex_destruir(pokedex);
     return 0;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
