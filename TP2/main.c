@@ -6,6 +6,9 @@
 #include <stdbool.h>
 #include <stdlib.h>
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#define ERROR -1
+#define EXITO 0
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void muestra_opciones_basicas(){
     printf("\t/***MENU***/\n");
     printf("\n\n");
@@ -36,16 +39,15 @@ void mostrar_menu(pokedex_t* pokedex, bool* menu_extendido, bool* quiere_salir){
     
     while(!(*quiere_salir) && !(*menu_extendido)){
         muestra_opciones_basicas();
-        scanf("%c", &letra);
+        scanf(" %c", &letra);
         while(letra != 'I' && letra != 'S' && letra != 'H'){
-            printf("q carajos?");
             printf("La letra insertada no corresponde a una opcion valida, vuelva a intentarlo.\n");
-            scanf("%c", &letra);
+            scanf(" %c", &letra);
         }
         if(letra == 'H'){
             printf("\n");
         }else if(letra == 'I'){
-            pokedex_prender(pokedex);
+            pokedex = pokedex_prender();
             *menu_extendido = true;
         }else{
             *quiere_salir = true;
@@ -61,13 +63,13 @@ void mostrar_menu_desbloqueado(pokedex_t* pokedex, bool* quiere_salir){
 
     while(!(*quiere_salir)){
         muestra_todas_las_opciones();
-        scanf("%c", &letra);
+        scanf(" %c", &letra);
         if(letra == 'I' || letra == 'G' || letra == 'S' || letra == 'H' || letra == 'A'|| letra == 'E'|| letra == 'C'|| letra == 'V'|| letra == 'M'|| letra == 'P'){
             letra_valida = true;
         }
         while(!letra_valida){
             printf("La letra insertada no corresponde a una opcion valida, vuelva a intentarlo.\n");
-            scanf("%c", &letra);
+            scanf(" %c", &letra);
             if(letra == 'I' || letra == 'G' || letra == 'S' || letra == 'H' || letra == 'A'|| letra == 'E'|| letra == 'C'|| letra == 'V'|| letra == 'M'|| letra == 'P'){
                 letra_valida = true;
             }
@@ -75,7 +77,7 @@ void mostrar_menu_desbloqueado(pokedex_t* pokedex, bool* quiere_salir){
         if(letra == 'H'){
             printf("\n");
         }else if(letra == 'I'){
-            pokedex_prender(pokedex);
+            pokedex = pokedex_prender();
         }else if(letra == 'S'){
             *quiere_salir = true;
         }else if(letra == 'G'){
@@ -104,7 +106,7 @@ void mostrar_menu_desbloqueado(pokedex_t* pokedex, bool* quiere_salir){
 }
 
 int main(){
-    pokedex_t* pokedex = NULL;
+    /*pokedex_t* pokedex = NULL;
     bool menu_extendido = false;
     bool quiere_salir = false;
     
@@ -116,15 +118,10 @@ int main(){
             mostrar_menu_desbloqueado(pokedex, &quiere_salir);
         }
     }
-    pokedex_destruir(pokedex);
-    return 0;
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
- /*int cantidad;
+    pokedex_destruir(pokedex);*/
+    /*int cantidad;
     especie_pokemon_t* especies[10];
-    especie_pokemon_t* especies2[10];
+    especie_pokemon_t* especies2[10];*/
     pokedex_t* pokedex = pokedex_crear("Ezequiel");
     if(pokedex_avistar(pokedex, "avistamientos.txt")== EXITO){
         printf("Perfecto\n");
@@ -132,7 +129,7 @@ int main(){
         printf("Error\n");
     }
     printf("%s\n", pokedex->nombre_entrenador);
-    
+    /*
     cantidad = arbol_recorrido_preorden(pokedex->pokemones, (void**)especies, 10);
     for(int i=0;i<cantidad;i++){
         printf("%i-", especies[i]->numero);
@@ -163,14 +160,14 @@ int main(){
             printf("%i-", (*(particular_pokemon_t*)lista_elemento_en_posicion(especies2[i]->pokemones, j)).nivel);
         }
         printf("\n\n");
-    }
+    }*/
     pokedex_ultimos_capturados(pokedex);
-    printf("\n\n");
+    printf("\n\n");/*
     pokedex_ultimos_vistos(pokedex);
     printf("\n\n");
     pokedex_informacion(pokedex, 25, "");
-    pokedex_apagar(pokedex);
-    pokedex_t* pokedex = pokedex_prender();
+    pokedex_apagar(pokedex);*/
+    /*pokedex_t* pokedex = pokedex_prender();
     int cantidad;
     especie_pokemon_t* especies[12];
     cantidad = arbol_recorrido_preorden(pokedex->pokemones, (void**)especies, 12);
@@ -181,8 +178,14 @@ int main(){
             printf("%i-", (*(particular_pokemon_t*)lista_elemento_en_posicion(especies[i]->pokemones, j)).nivel);
         }
         printf("\n\n");
-    }
-    pokedex_destruir(pokedex);*/
+    }*/
+    pokedex_destruir(pokedex);
+    return 0;
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ /**/
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
