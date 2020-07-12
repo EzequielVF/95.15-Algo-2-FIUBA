@@ -106,7 +106,7 @@ void mostrar_menu_desbloqueado(pokedex_t* pokedex, bool* quiere_salir){
 }
 
 int main(){
-    /*pokedex_t* pokedex = NULL;
+    pokedex_t* pokedex = NULL;
     bool menu_extendido = false;
     bool quiere_salir = false;
     
@@ -118,74 +118,7 @@ int main(){
             mostrar_menu_desbloqueado(pokedex, &quiere_salir);
         }
     }
-    pokedex_destruir(pokedex);*/
-    /*int cantidad;
-    especie_pokemon_t* especies[10];
-    especie_pokemon_t* especies2[10];*/
-    pokedex_t* pokedex = pokedex_crear("Ezequiel");
-    if(pokedex_avistar(pokedex, "avistamientos.txt")== EXITO){
-        printf("Perfecto\n");
-    }else{
-        printf("Error\n");
-    }
-    printf("%s\n", pokedex->nombre_entrenador);
-    /*
-    cantidad = arbol_recorrido_preorden(pokedex->pokemones, (void**)especies, 10);
-    for(int i=0;i<cantidad;i++){
-        printf("%i-", especies[i]->numero);
-        printf("Niveles de pokemones en la lista: ");
-        for(size_t j=0;j<lista_elementos(especies[i]->pokemones);j++){
-            printf("%i-", (*(particular_pokemon_t*)lista_elemento_en_posicion(especies[i]->pokemones, j)).nivel);
-        }
-        printf("\n\n");
-    }
-    for(size_t j=0;j<lista_elementos(pokedex->ultimos_vistos);j++){
-            printf("%s-", (*(particular_pokemon_t*)lista_elemento_en_posicion(pokedex->ultimos_vistos, j)).nombre);
-            printf("%i-", (*(particular_pokemon_t*)lista_elemento_en_posicion(pokedex->ultimos_vistos, j)).nivel);
-    }
-    printf("\n\n");
-    for(size_t j=0;j<lista_elementos(pokedex->ultimos_capturados);j++){
-            printf("%s-", (*(particular_pokemon_t*)lista_elemento_en_posicion(pokedex->ultimos_capturados, j)).nombre);
-            printf("%i-", (*(particular_pokemon_t*)lista_elemento_en_posicion(pokedex->ultimos_capturados, j)).nivel);
-    }
-	printf("\n");
-    if(pokedex_evolucionar(pokedex, "evoluciones.txt")== EXITO){
-        printf("Perfecto\n");
-    }
-    cantidad = arbol_recorrido_preorden(pokedex->pokemones, (void**)especies2, 10);
-    for(int i=0;i<cantidad;i++){
-        printf("%i-", especies2[i]->numero);
-        printf("Niveles de pokemones en la lista: ");
-        for(size_t j=0;j<lista_elementos(especies2[i]->pokemones);j++){
-            printf("%i-", (*(particular_pokemon_t*)lista_elemento_en_posicion(especies2[i]->pokemones, j)).nivel);
-        }
-        printf("\n\n");
-    }*/
-    pokedex_ultimos_capturados(pokedex);
-    printf("\n\n");/*
-    pokedex_ultimos_vistos(pokedex);
-    printf("\n\n");
-    pokedex_informacion(pokedex, 25, "");
-    pokedex_apagar(pokedex);*/
-    /*pokedex_t* pokedex = pokedex_prender();
-    int cantidad;
-    especie_pokemon_t* especies[12];
-    cantidad = arbol_recorrido_preorden(pokedex->pokemones, (void**)especies, 12);
-    for(int i=0;i<cantidad;i++){
-        printf("%i-", especies[i]->numero);
-        printf("Niveles de pokemones en la lista: ");
-        for(size_t j=0;j<lista_elementos(especies[i]->pokemones);j++){
-            printf("%i-", (*(particular_pokemon_t*)lista_elemento_en_posicion(especies[i]->pokemones, j)).nivel);
-        }
-        printf("\n\n");
-    }*/
     pokedex_destruir(pokedex);
+    
     return 0;
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
- /**/
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

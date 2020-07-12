@@ -438,8 +438,8 @@ void pokedex_destruir(pokedex_t* pokedex){
     free(pokedex);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int main(){
-    /*pokedex_t* pokedex = NULL;
+/*int main(){
+    pokedex_t* pokedex = NULL;
     bool menu_extendido = false;
     bool quiere_salir = false;
     
@@ -451,8 +451,8 @@ int main(){
             mostrar_menu_desbloqueado(pokedex, &quiere_salir);
         }
     }
-    pokedex_destruir(pokedex);*/
-    /*int cantidad;
+    pokedex_destruir(pokedex);
+    int cantidad;
     especie_pokemon_t* especies[10];
     especie_pokemon_t* especies2[10];
     pokedex_t* pokedex = pokedex_crear("Ezequiel");
@@ -501,7 +501,7 @@ int main(){
     printf("\n\n");
     pokedex_ultimos_vistos(pokedex);
     pokedex_informacion(pokedex, 25, "");
-    pokedex_apagar(pokedex);*/
+    pokedex_apagar(pokedex);
     pokedex_t* pokedex = pokedex_prender();
     int cantidad;
     especie_pokemon_t* especies[12];
@@ -516,4 +516,4 @@ int main(){
     }
     pokedex_destruir(pokedex);
     return 0;
-}
+}*/
