@@ -1,4 +1,4 @@
-Ezequiel
+unknown
 E;Pikachu;25;Pikachu es un raton...
 P;Kachu;15;N
 P;Pikacha;20;N

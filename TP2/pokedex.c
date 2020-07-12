@@ -6,6 +6,13 @@
 #include <stdbool.h>
 #include <stdlib.h>
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#define ANSI_COLOR_RED     "\x1b[31m"
+#define ANSI_COLOR_GREEN   "\x1b[32m"
+#define ANSI_COLOR_YELLOW  "\x1b[33m"
+#define ANSI_COLOR_BLUE    "\x1b[34m"
+#define ANSI_COLOR_MAGENTA "\x1b[35m"
+#define ANSI_COLOR_CYAN    "\x1b[36m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
 #define ERROR -1
 #define EXITO 0
 #define FORMATO_LECTURA_AVISTAMIENTOS "%i;%[^;];%[^;];%[^;];%i;%c\n"
@@ -346,10 +353,10 @@ void pokedex_informacion(pokedex_t* pokedex, int numero_pokemon, char nombre_pok
         }
     }
     if(!especie_en_pokedex){
-        printf("Especie desconocida.\n");
+        printf(ANSI_COLOR_RED"Especie desconocida.\n"ANSI_COLOR_RESET);
     }
-    if(!pokemon_encontrado && !especie_en_pokedex){
-        printf("Pokemon desconocido.\n");
+    if(!pokemon_encontrado && especie_en_pokedex){
+        printf(ANSI_COLOR_RED"Pokemon desconocido.\n"ANSI_COLOR_RESET);
     }
 }
 /////////////////////////////////////////////////////////AUXILIAR APAGAR//////////////////////////////////////////////////////////////////////////////////////
@@ -406,7 +413,11 @@ pokedex_t* pokedex_prender(){
     FILE* pokedextxt = fopen("pokedex.txt", "r");
     if(!pokedextxt) return NULL;
 
-    fscanf(pokedextxt, "%[^\n]\n", nombre);
+    leido = fscanf(pokedextxt, "%[^\n]\n", nombre);
+    if(leido != 1){
+        strcpy(nombre, "");
+    }
+
     aux = pokedex_crear(nombre);
     leido = fscanf(pokedextxt, "%c;", &letra_indice);
     while(leido == 1){
