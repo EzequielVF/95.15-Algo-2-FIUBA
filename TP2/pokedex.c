@@ -130,7 +130,7 @@ void insertar_pokemon_en_especie(pokedex_t* pokedex, especie_pokemon_t* especie_
         lista_insertar(especie_leida->pokemones, pokemon_leido);
         arbol_insertar(pokedex->pokemones, especie_leida);
         *inserto_pokemon = true;
-    }else{ ///LIBERO LA LISTA DE LA ESPECIE QUE CREE SI YA ESTA EN EL ARBOL Y AGREGO EL POKEMON A LA UBICADA EN EL ARBOL
+    }else{ ///LIBERO LA LISTA DE LA ESPECIE QUE CREE SI YA ESTA EN EL ARBOL Y AGREGO EL POKEMON A LA UBICADA ENEL ARBOL
         lista_insertar(especie_en_pokedex->pokemones, pokemon_leido);
         lista_destruir(especie_leida->pokemones);
         free(especie_leida);
@@ -144,9 +144,9 @@ void encolar_pokemon_ultimos_vistos(lista_t* cola, particular_pokemon_t* pokemon
     }
 }
 
-void apilar_pokemon_capturados(lista_t* pila, particular_pokemon_t* pokemon_leido, bool* inserto_en_pila){
+void apilar_pokemon_capturados(lista_t* cola, particular_pokemon_t* pokemon_leido, bool* inserto_en_pila){
     if(pokemon_leido->capturado == true){
-        if(lista_apilar(pila, pokemon_leido) == EXITO){ ///INSERTO POKEMON EN LA PILA DE CAPTURADOS
+        if(lista_apilar(cola, pokemon_leido) == EXITO){ ///INSERTO POKEMON EN LA PILA DE CAPTURADOS
             *inserto_en_pila = true;
         }
     }
@@ -210,13 +210,13 @@ particular_pokemon_t* buscar_pokemon_a_evolucionar(especie_pokemon_t* especie_en
     return pokemon_aux;
 }
 
-void mover_pokemon_de_especie_a_especie(pokedex_t* pokedex, especie_pokemon_t* especie_en_pokedex, particular_pokemon_t* pokemon_nuevo, especie_pokemon_t* especie_nueva, especie_pokemon_t* especie_a_evolucionar_en_pokedex, bool* inserto_pokemon, bool* problemas_asignacion, size_t posicion_pokemon, particular_pokemon_t* pokemon_aux){
+void mover_pokemon_de_especie_a_especie(pokedex_t* pokedex, especie_pokemon_t* especie_en_pokedex, especie_pokemon_t* especie_nueva, especie_pokemon_t* especie_a_evolucionar_en_pokedex, bool* inserto_pokemon, bool* problemas_asignacion, size_t posicion_pokemon, particular_pokemon_t* pokemon_aux){
     if(!especie_a_evolucionar_en_pokedex){ ///INSERTO LA ESPECIE EN EL ARBOL SI NO ESTA
-        lista_insertar(especie_nueva->pokemones, pokemon_nuevo);
+        lista_insertar(especie_nueva->pokemones, pokemon_aux);
         arbol_insertar(pokedex->pokemones, especie_nueva);
         *inserto_pokemon = true;
     }else{ ///LIBERO LA ESPECIE QUE CREE Y AGREGO EL POKEMON A LA UBICADA EN EL ARBOL
-        lista_insertar(especie_a_evolucionar_en_pokedex->pokemones, pokemon_nuevo);
+        lista_insertar(especie_a_evolucionar_en_pokedex->pokemones, pokemon_aux);
         lista_destruir(especie_nueva->pokemones);
         free(especie_nueva);
         *inserto_pokemon = true;
@@ -225,7 +225,6 @@ void mover_pokemon_de_especie_a_especie(pokedex_t* pokedex, especie_pokemon_t* e
         *problemas_asignacion = true;
     }else{
         lista_borrar_de_posicion(especie_en_pokedex->pokemones, posicion_pokemon);
-        free(pokemon_aux);
     } 
 }
 /////////////////////////////////////////////////////////POKEDEX EVOLUCIONAR////////////////////////////////////////////////////////////////////
@@ -239,7 +238,6 @@ int pokedex_evolucionar(pokedex_t* pokedex, char ruta_archivo[MAX_RUTA]){
     especie_pokemon_t* especie_en_pokedex;
     especie_pokemon_t* especie_a_evolucionar_en_pokedex;
     especie_pokemon_t* especie_nueva;
-    particular_pokemon_t* pokemon_nuevo;
     particular_pokemon_t* pokemon_aux;
     int numero_especie_base = 0, numero_especie_nueva = 0, estado = EXITO, leido = 0;
     size_t posicion_pokemon = 0, i = 0;
@@ -255,10 +253,9 @@ int pokedex_evolucionar(pokedex_t* pokedex, char ruta_archivo[MAX_RUTA]){
             pokemon_aux = buscar_pokemon_a_evolucionar(especie_en_pokedex, &pokemon_encontrado, &posicion_pokemon, &i, pokemon_leido);
         }
         if(pokemon_encontrado){
-            pokemon_nuevo = crear_pokemon(pokemon_aux->nombre, pokemon_aux->nivel, 'S');
             especie_nueva = crear_especie(numero_especie_nueva, nombre_especie_nueva, descripcion_especie_nueva);
             especie_a_evolucionar_en_pokedex = (especie_pokemon_t*)arbol_buscar(pokedex->pokemones, especie_nueva);
-            mover_pokemon_de_especie_a_especie(pokedex, especie_en_pokedex, pokemon_nuevo, especie_nueva, especie_a_evolucionar_en_pokedex, &inserto_pokemon, &problemas_asignacion, posicion_pokemon, pokemon_aux);
+            mover_pokemon_de_especie_a_especie(pokedex, especie_en_pokedex, especie_nueva, especie_a_evolucionar_en_pokedex, &inserto_pokemon, &problemas_asignacion, posicion_pokemon, pokemon_aux);
         }
         inserto_pokemon = false;
         pokemon_encontrado = false;
@@ -275,7 +272,8 @@ int pokedex_evolucionar(pokedex_t* pokedex, char ruta_archivo[MAX_RUTA]){
 }
 /////////////////////////////////////////////////////////POKEDEX ULTIMOS CAPTURADOS////////////////////////////////////////////////////////////////////
 void pokedex_ultimos_capturados(pokedex_t* pokedex){
-    if(!pokedex) return;  
+    if(!pokedex) return; 
+    if(lista_vacia(pokedex->ultimos_capturados)) return; 
     size_t cantidad = lista_elementos(pokedex->ultimos_capturados);
     particular_pokemon_t* cosa = NULL;
     for(size_t i = (cantidad-1); i > 0; i--){
@@ -285,10 +283,12 @@ void pokedex_ultimos_capturados(pokedex_t* pokedex){
     cosa = (particular_pokemon_t*)lista_elemento_en_posicion(pokedex->ultimos_capturados, ORIGEN);
     printf("%s-%i\n", cosa->nombre, cosa->nivel);
     lista_destruir(pokedex->ultimos_capturados);
+    pokedex->ultimos_capturados = NULL;
 }
 /////////////////////////////////////////////////////////POKEDEX ULTIMOS VISTOS////////////////////////////////////////////////////////////////////
 void pokedex_ultimos_vistos(pokedex_t* pokedex){
-    if(!pokedex) return;  
+    if(!pokedex) return; 
+    if(lista_vacia(pokedex->ultimos_vistos)) return; 
     size_t cantidad = lista_elementos(pokedex->ultimos_vistos);
     particular_pokemon_t* cosa = NULL;
     for(size_t i = 0; i < cantidad; i++){
@@ -296,6 +296,7 @@ void pokedex_ultimos_vistos(pokedex_t* pokedex){
         printf("%s-%i\n", cosa->nombre, cosa->nivel);
     }
     lista_destruir(pokedex->ultimos_vistos);
+    pokedex->ultimos_vistos = NULL;
 }
 /////////////////////////////////////////////////////////AUXILIARES INFORMACION///////////////////////////////////////////////////////////////////
 void buscar_pokemon(bool* pokemon_encontrado, particular_pokemon_t* pokemon_en_pokedex, particular_pokemon_t pokemon_leido, especie_pokemon_t* especie_en_pokedex){
@@ -303,7 +304,7 @@ void buscar_pokemon(bool* pokemon_encontrado, particular_pokemon_t* pokemon_en_p
     while(i < cantidad && !(*pokemon_encontrado)){
         pokemon_en_pokedex = (particular_pokemon_t*)lista_elemento_en_posicion(especie_en_pokedex->pokemones, i);
         if(strcmp(pokemon_en_pokedex->nombre, pokemon_leido.nombre) == COINCIDENCIA){
-            printf("%s-%s-%i\n", especie_en_pokedex->nombre, pokemon_en_pokedex->nombre, pokemon_en_pokedex->nivel);
+            printf("%s-%i\n", pokemon_en_pokedex->nombre, pokemon_en_pokedex->nivel);
             *pokemon_encontrado = true;
         }
         i++;
@@ -313,7 +314,6 @@ void buscar_pokemon(bool* pokemon_encontrado, particular_pokemon_t* pokemon_en_p
 void imprimir_pokemones_de_una_especie(bool* pokemon_encontrado, especie_pokemon_t* especie_en_pokedex){
     size_t i = 0, cantidad = lista_elementos(especie_en_pokedex->pokemones);
     particular_pokemon_t* cosa = NULL;
-    printf("%s:\n", especie_en_pokedex->nombre);
     for(i = 0; i < cantidad; i++){
         cosa = (particular_pokemon_t*)lista_elemento_en_posicion(especie_en_pokedex->pokemones, i);
         printf("%s-%i\n", cosa->nombre, cosa->nivel);
@@ -322,7 +322,7 @@ void imprimir_pokemones_de_una_especie(bool* pokemon_encontrado, especie_pokemon
 }
 /////////////////////////////////////////////////////////POKEDEX INFORMACION////////////////////////////////////////////////////////////////////
 void pokedex_informacion(pokedex_t* pokedex, int numero_pokemon, char nombre_pokemon[MAX_NOMBRE]){
-    if(!pokedex) return;  
+    if(!pokedex) return;
     especie_pokemon_t especie_leida;
     particular_pokemon_t pokemon_leido;
     especie_pokemon_t* especie_en_pokedex = NULL;
@@ -345,11 +345,14 @@ void pokedex_informacion(pokedex_t* pokedex, int numero_pokemon, char nombre_pok
             imprimir_pokemones_de_una_especie(&pokemon_encontrado, especie_en_pokedex);
         }
     }
-    if(!especie_en_pokedex || !pokemon_encontrado){
-        printf("Especie o Pokemon desconocido\n");
+    if(!especie_en_pokedex){
+        printf("Especie desconocida.\n");
+    }
+    if(!pokemon_encontrado && !especie_en_pokedex){
+        printf("Pokemon desconocido.\n");
     }
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////AUXILIAR APAGAR//////////////////////////////////////////////////////////////////////////////////////
 bool escribir_elemento(void* elemento, void* extra){
 	FILE* pokedextxt = (FILE*)extra;
 	especie_pokemon_t* cosa = (especie_pokemon_t*)elemento;
@@ -372,7 +375,7 @@ bool escribir_elemento(void* elemento, void* extra){
     }
 	return false;
 }
-
+/////////////////////////////////////////////////////////POKEDEX APAGAR//////////////////////////////////////////////////////////////////////////////////////
 int pokedex_apagar(pokedex_t* pokedex){
     if(!pokedex) return ERROR;
     FILE* pokedextxt = fopen("pokedex.txt", "w");
@@ -384,7 +387,7 @@ int pokedex_apagar(pokedex_t* pokedex){
     fclose(pokedextxt);
     return EXITO;
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////POKEDEX PRENDER//////////////////////////////////////////////////////////////////////////////////////
 pokedex_t* pokedex_prender(){
     pokedex_t* aux = NULL;
     especie_pokemon_t* especie_leida = NULL;
@@ -422,7 +425,7 @@ pokedex_t* pokedex_prender(){
     fclose(pokedextxt);
     return aux;
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////POKEDEX DESTRUIR//////////////////////////////////////////////////////////////////////////////////////
 void pokedex_destruir(pokedex_t* pokedex){
     if(!pokedex) return;
     if(pokedex->ultimos_capturados)
@@ -451,7 +454,7 @@ int main(){
     pokedex_destruir(pokedex);*/
     /*int cantidad;
     especie_pokemon_t* especies[10];
-    especie_pokemon_t* especies2[10];*/
+    especie_pokemon_t* especies2[10];
     pokedex_t* pokedex = pokedex_crear("Ezequiel");
     if(pokedex_avistar(pokedex, "avistamientos.txt")== EXITO){
         printf("Perfecto\n");
@@ -459,7 +462,7 @@ int main(){
         printf("Error\n");
     }
     printf("%s\n", pokedex->nombre_entrenador);
-    /*
+    
     cantidad = arbol_recorrido_preorden(pokedex->pokemones, (void**)especies, 10);
     for(int i=0;i<cantidad;i++){
         printf("%i-", especies[i]->numero);
@@ -490,14 +493,16 @@ int main(){
             printf("%i-", (*(particular_pokemon_t*)lista_elemento_en_posicion(especies2[i]->pokemones, j)).nivel);
         }
         printf("\n\n");
-    }*/
+    }
     pokedex_ultimos_capturados(pokedex);
-    printf("\n\n");/*
+    printf("\n\n");
+    pokedex_ultimos_capturados(pokedex);
     pokedex_ultimos_vistos(pokedex);
     printf("\n\n");
+    pokedex_ultimos_vistos(pokedex);
     pokedex_informacion(pokedex, 25, "");
     pokedex_apagar(pokedex);*/
-    /*pokedex_t* pokedex = pokedex_prender();
+    pokedex_t* pokedex = pokedex_prender();
     int cantidad;
     especie_pokemon_t* especies[12];
     cantidad = arbol_recorrido_preorden(pokedex->pokemones, (void**)especies, 12);
@@ -508,7 +513,7 @@ int main(){
             printf("%i-", (*(particular_pokemon_t*)lista_elemento_en_posicion(especies[i]->pokemones, j)).nivel);
         }
         printf("\n\n");
-    }*/
+    }
     pokedex_destruir(pokedex);
     return 0;
 }
