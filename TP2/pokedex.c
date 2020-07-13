@@ -311,7 +311,7 @@ void buscar_pokemon(bool* pokemon_encontrado, particular_pokemon_t* pokemon_en_p
     while(i < cantidad && !(*pokemon_encontrado)){
         pokemon_en_pokedex = (particular_pokemon_t*)lista_elemento_en_posicion(especie_en_pokedex->pokemones, i);
         if(strcmp(pokemon_en_pokedex->nombre, pokemon_leido.nombre) == COINCIDENCIA){
-            printf("%s-%i\n", pokemon_en_pokedex->nombre, pokemon_en_pokedex->nivel);
+            printf("Nombre:%s - Nivel:%i\n", pokemon_en_pokedex->nombre, pokemon_en_pokedex->nivel);
             *pokemon_encontrado = true;
         }
         i++;
@@ -323,7 +323,7 @@ void imprimir_pokemones_de_una_especie(bool* pokemon_encontrado, especie_pokemon
     particular_pokemon_t* cosa = NULL;
     for(i = 0; i < cantidad; i++){
         cosa = (particular_pokemon_t*)lista_elemento_en_posicion(especie_en_pokedex->pokemones, i);
-        printf("%s-%i\n", cosa->nombre, cosa->nivel);
+        printf("Nombre:%s - Nivel:%i\n", cosa->nombre, cosa->nivel);
     }
     *pokemon_encontrado = true;
 }
@@ -343,11 +343,10 @@ void pokedex_informacion(pokedex_t* pokedex, int numero_pokemon, char nombre_pok
     especie_leida.numero = numero_pokemon;
     especie_en_pokedex = (especie_pokemon_t*)arbol_buscar(pokedex->pokemones, &especie_leida);
     if(especie_en_pokedex){
+         printf("Especie:%s - Numero:%i - Descripcion:%s\n", especie_en_pokedex->nombre, especie_en_pokedex->numero, especie_en_pokedex->descripcion);
         if(nombre_especifico){
-            printf("%s-%i-%s\n", especie_en_pokedex->nombre, especie_en_pokedex->numero, especie_en_pokedex->descripcion);
             buscar_pokemon(&pokemon_encontrado, pokemon_en_pokedex, pokemon_leido, especie_en_pokedex);         
         }else{
-            printf("%s-%i-%s\n", especie_en_pokedex->nombre, especie_en_pokedex->numero, especie_en_pokedex->descripcion);
             printf("Pokemones observados de esta especie:\n");
             imprimir_pokemones_de_una_especie(&pokemon_encontrado, especie_en_pokedex);
         }

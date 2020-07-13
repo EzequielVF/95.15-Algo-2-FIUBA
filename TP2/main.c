@@ -28,7 +28,6 @@ void muestra_opciones_basicas(){
 void muestra_todas_las_opciones(){
     printf(ANSI_COLOR_CYAN"\t/***MENU***/\n");
     printf("\n\n");
-    printf("Iniciar Pokedex (Tecla I)\n");
     printf("Guardar Pokedex (Tecla G)\n");
     printf("Salir del programa (Tecla S)\n");
     printf("Ayuda (Tecla H)\n");
@@ -83,11 +82,6 @@ int main(){
                 printf("\n");
                 printf(ANSI_COLOR_YELLOW"/***********************************/\n"ANSI_COLOR_RESET);
                 /////////////////////////////////////////////////////////////////////////////////////
-            }else if(letra == 'I'){
-                /////////////////////////////////////////////////////////////////////////////////////
-                pokedex = pokedex_prender();
-                printf(ANSI_COLOR_YELLOW"/***********************************/\n"ANSI_COLOR_RESET);
-                /////////////////////////////////////////////////////////////////////////////////////
             }else if(letra == 'S'){
                 /////////////////////////////////////////////////////////////////////////////////////
                 pokedex_destruir(pokedex);
@@ -99,6 +93,7 @@ int main(){
                 if(estado == EXITO){
                     printf(ANSI_COLOR_GREEN"Informacion guardada exitosamente!\n"ANSI_COLOR_RESET);
                     printf(ANSI_COLOR_YELLOW"/***********************************/\n"ANSI_COLOR_RESET);
+                    menu_extendido = false;
                 }else{
                     printf(ANSI_COLOR_RED"Error al guardar informacion!\n"ANSI_COLOR_RESET);
                     printf(ANSI_COLOR_YELLOW"/***********************************/\n"ANSI_COLOR_RESET);
