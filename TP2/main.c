@@ -28,6 +28,7 @@ void muestra_opciones_basicas(){
 void muestra_todas_las_opciones(){
     printf(ANSI_COLOR_CYAN"\t/***MENU***/\n");
     printf("\n\n");
+    printf("Iniciar Pokedex (Tecla I)\n");
     printf("Guardar Pokedex (Tecla G)\n");
     printf("Salir del programa (Tecla S)\n");
     printf("Ayuda (Tecla H)\n");
@@ -38,6 +39,31 @@ void muestra_todas_las_opciones(){
     printf("Informacion especie (Tecla M)\n");
     printf("Informacion Pokemon (Tecla P)\n");
     printf("/*********************************/\n"ANSI_COLOR_RESET );
+}
+
+void descripcion_basica(){
+    printf(ANSI_COLOR_GREEN"\tOpciones validas:\n"ANSI_COLOR_RESET);
+    printf(ANSI_COLOR_CYAN"Iniciar Pokedex (tecla I): Da inicio a la Pokedex, lee informacion del archivo pokedex.txt\n");
+    printf("Salir del programa (tecla S): Da por finalizado el programa y libera la memoria que se encuentra reservada.\n");
+    printf("Ayuda (tecla H): Brinda una breve descripcion sobre los comandos validos actuales.\n"ANSI_COLOR_RESET);
+    printf(ANSI_COLOR_YELLOW"/***********************************/\n"ANSI_COLOR_RESET);
+}
+
+void descripcion_completa(){
+    printf(ANSI_COLOR_GREEN"\tOpciones validas:\n"ANSI_COLOR_RESET);
+    printf(ANSI_COLOR_YELLOW"Guardar Pokedex (tecla G): almacena el estado actual de la pokedex en el archivo pokedex.txt.\n");
+    printf("Salir del programa (tecla S): Da por finalizado el programa y libera la memoria que se encuentra reservada.\n");
+    printf("Ayuda (tecla H): Brinda una breve descripcion sobre los comandos validos actuales.\n");
+    printf("Avistar Pokémon (tecla A): Incorpora a la pokedex los pokemones presentes en el archivo avistamientos.txt.\n");
+    printf("Evolucionar Pokemon (Tecla E): Actualiza a los pokemones validos para evolucionar presentes en evoluciones.txt.\n");
+    printf("Capturas Recientes (Tecla C): Muestra un listado de los ultimos pokemones capturados, luego de su uso vacia ese registro.\n");
+    printf("Vistas recientes (Tecla V): Muestra un listado de los ultimos pokemones vistos, luego de ser consultado vacia el listado.\n");
+    printf("Informacion especie (Tecla M): Brinda informacion sobre la especie buscada.\n");
+    printf("Informacion Pokemon (Tecla P): Brinda informacion sobre el pokemon y su especie.\n"ANSI_COLOR_RESET);
+    printf(ANSI_COLOR_YELLOW"/***********************************/\n"ANSI_COLOR_RESET);
+    printf(ANSI_COLOR_CYAN"Iniciar Pokedex (tecla I): Da inicio a la Pokedex, lee informacion del archivo pokedex.txt"ANSI_COLOR_RESET);
+    printf(ANSI_COLOR_RED"\t No valido, pokedex ya iniciada.\n"ANSI_COLOR_RESET);
+    printf(ANSI_COLOR_YELLOW"/***********************************/\n"ANSI_COLOR_RESET);
 }
 
 int main(){
@@ -59,15 +85,24 @@ int main(){
             }
             system("clear");
             if(letra == 'H'){
-                printf("\n");
-                printf(ANSI_COLOR_YELLOW"/***********************************/\n"ANSI_COLOR_RESET);
+                /////////////////////////////////////////////////////////////////////////////////////
+                descripcion_basica();
             }else if(letra == 'I'){
-                pokedex = pokedex_prender();
+                /////////////////////////////////////////////////////////////////////////////////////
+                if(!pokedex){
+                    pokedex = pokedex_prender();
+                }else{
+                    pokedex_destruir(pokedex);
+                    pokedex = pokedex_prender();
+                }
                 menu_extendido = true;
                 printf(ANSI_COLOR_YELLOW"/***********************************/\n"ANSI_COLOR_RESET);
+                /////////////////////////////////////////////////////////////////////////////////////
             }else{
+                /////////////////////////////////////////////////////////////////////////////////////
                 pokedex_destruir(pokedex);
                 quiere_salir = true;
+                /////////////////////////////////////////////////////////////////////////////////////
             }
         }else{
             muestra_todas_las_opciones();
@@ -79,8 +114,12 @@ int main(){
             system("clear");
             if(letra == 'H'){
                 /////////////////////////////////////////////////////////////////////////////////////
-                printf("\n");
-                printf(ANSI_COLOR_YELLOW"/***********************************/\n"ANSI_COLOR_RESET);
+                descripcion_completa();
+                /////////////////////////////////////////////////////////////////////////////////////
+            }else if(letra == 'I'){
+                /////////////////////////////////////////////////////////////////////////////////////
+                    printf(ANSI_COLOR_RED"La pokedex ya se encuentra iniciada.\n"ANSI_COLOR_RESET);
+                    printf(ANSI_COLOR_YELLOW"/***********************************/\n"ANSI_COLOR_RESET);
                 /////////////////////////////////////////////////////////////////////////////////////
             }else if(letra == 'S'){
                 /////////////////////////////////////////////////////////////////////////////////////
