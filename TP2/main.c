@@ -89,13 +89,15 @@ int main(){
                 descripcion_basica();
             }else if(letra == 'I'){
                 /////////////////////////////////////////////////////////////////////////////////////
-                if(!pokedex){
-                    pokedex = pokedex_prender();
-                }else{
+                if(pokedex){
                     pokedex_destruir(pokedex);
-                    pokedex = pokedex_prender();
                 }
-                menu_extendido = true;
+                pokedex = pokedex_prender();
+                if(pokedex){
+                    menu_extendido = true;
+                }else{
+                    printf(ANSI_COLOR_RED"Error al encerder la pokedex, falta el archivo pokedex.txt.\n"ANSI_COLOR_RESET);
+                }
                 printf(ANSI_COLOR_YELLOW"/***********************************/\n"ANSI_COLOR_RESET);
                 /////////////////////////////////////////////////////////////////////////////////////
             }else{
