@@ -1,5 +1,5 @@
 #include "hash.h"
-#include "hash_iterador.h"
+//#include "hash_iterador.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -55,9 +55,8 @@ int main(){
   hash_t* garage = hash_crear(destruir_string, 3);
 
   printf("Agrego autos al garage\n");
-  
   guardar_vehiculo(garage, "AC123BD", "Auto de Mariano");
-  guardar_vehiculo(garage, "OPQ976", "Auto de Lucas");
+  /*guardar_vehiculo(garage, "OPQ976", "Auto de Lucas");
   guardar_vehiculo(garage, "A421ACB", "Moto de Manu");
   guardar_vehiculo(garage, "AA442CD", "Auto de Guido");
   guardar_vehiculo(garage, "AC152AD", "Auto de Agustina");
@@ -79,8 +78,8 @@ int main(){
 
   verificar_vehiculo(garage, "QDM443", false);
   verificar_vehiculo(garage, "PQO697", false);
-  
-  hash_iterador_t* iter = hash_iterador_crear(garage);
+  */
+  /*hash_iterador_t* iter = hash_iterador_crear(garage);
   size_t listados = 0;
 
   while(hash_iterador_tiene_siguiente(iter)){
@@ -96,7 +95,7 @@ int main(){
   hash_iterador_destruir(iter);
 
   size_t impresas = hash_con_cada_clave(garage, mostrar_patente, NULL);
-  printf("Se mostraron %zu patentes con el iterador interno\n\n", impresas);
+  printf("Se mostraron %zu patentes con el iterador interno\n\n", impresas);*/
   
   hash_destruir(garage);
   
