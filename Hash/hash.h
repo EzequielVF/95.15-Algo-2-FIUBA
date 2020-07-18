@@ -69,7 +69,6 @@ size_t hash_cantidad(hash_t* hash);
  */
 void hash_destruir(hash_t* hash);
 
-
 /*
  * Recorre cada una de las claves almacenadas en la tabla de hash e
  * invoca a la función funcion, pasandole como parámetros el hash, la
