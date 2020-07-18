@@ -56,7 +56,7 @@ int main(){
 
   printf("Agrego autos al garage\n");
   guardar_vehiculo(garage, "AC123BD", "Auto de Mariano");
-  /*guardar_vehiculo(garage, "OPQ976", "Auto de Lucas");
+  guardar_vehiculo(garage, "OPQ976", "Auto de Lucas");
   guardar_vehiculo(garage, "A421ACB", "Moto de Manu");
   guardar_vehiculo(garage, "AA442CD", "Auto de Guido");
   guardar_vehiculo(garage, "AC152AD", "Auto de Agustina");
@@ -66,20 +66,25 @@ int main(){
   guardar_vehiculo(garage, "BD123AC", "Auto de Pablo");
   guardar_vehiculo(garage, "CD442AA", "Auto de Micaela");
   guardar_vehiculo(garage, "PQO697", "Auto de Juan");
+  hash_cantidad(garage);
   guardar_vehiculo(garage, "DZE443", "Auto de Jonathan otra vez");
+  hash_cantidad(garage);
   guardar_vehiculo(garage, "AC152AD", "Auto de Agustina otra vez");
+  hash_cantidad(garage);
 
   verificar_vehiculo(garage, "QDM443", true);
   verificar_vehiculo(garage, "PQO697", true);
 
-  
+  hash_cantidad(garage);
   quitar_vehiculo(garage, "QDM443");
+  hash_cantidad(garage);
   quitar_vehiculo(garage, "PQO697");
+  hash_cantidad(garage);
 
   verificar_vehiculo(garage, "QDM443", false);
   verificar_vehiculo(garage, "PQO697", false);
-  */
-  /*hash_iterador_t* iter = hash_iterador_crear(garage);
+/*
+  hash_iterador_t* iter = hash_iterador_crear(garage);
   size_t listados = 0;
 
   while(hash_iterador_tiene_siguiente(iter)){

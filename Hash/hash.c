@@ -1,5 +1,6 @@
 #include "lista.h"
 #include "hash.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
@@ -57,6 +58,7 @@ void destruir_cosa(cosa_t* cosa, hash_destruir_dato_t destructor){
 	if(!destructor) return;
 
 	destructor(cosa->elemento);
+	free(cosa->clave);
 	free(cosa);
 }
 ////////////////////////////////////////////////////////////////HASH CREAR/////////////////////////////////////////////////////////////////
@@ -87,12 +89,15 @@ hash_t* hash_crear(hash_destruir_dato_t destruir_elemento, size_t capacidad){
 }
 //////////////////////////////////////////////////////////////////HASH INSERTAR////////////////////////////////////////////////////////////////////
 float factor_carga(hash_t* hash){
-	float factor = (float)(hash->cantidad/hash->tamanio);
+	float factor = 0;
+	float cantidad = (float)hash->cantidad;
+	float tamnio = (float)hash->tamanio;
+	factor = (float)(cantidad/tamnio);
 	return factor;
 }
 
 int redimensionar_vector_listas(hash_t* hash){
-	size_t nuevo_tamanio = hash->tamanio*2;
+	size_t nuevo_tamanio = ((hash->tamanio)*2)+1;
 	size_t cantidad = hash->cantidad;
 	lista_t** nuevo_indice = malloc(sizeof(lista_t*)*nuevo_tamanio);
 	if(!nuevo_indice) return ERROR;
@@ -102,8 +107,8 @@ int redimensionar_vector_listas(hash_t* hash){
 	}
 	for(size_t j = 0; j < hash->tamanio; j++){
 		if(hash->indice[j]){
-			while(!lista_vacia(hash->indice[j])){
-				cosa_t* aux = lista_elemento_en_posicion(hash->indice[j], ORIGEN);
+			while(!lista_vacia(hash->indice[j])){ 
+				cosa_t* aux = (cosa_t*)lista_elemento_en_posicion(hash->indice[j], ORIGEN);
 				lista_borrar_de_posicion(hash->indice[j], ORIGEN);
 				size_t posicion = hashing(nuevo_tamanio, aux);
 				lista_insertar(nuevo_indice[posicion], aux);
@@ -115,17 +120,22 @@ int redimensionar_vector_listas(hash_t* hash){
 	hash->indice = nuevo_indice;
 	hash->tamanio = nuevo_tamanio;
 	hash->cantidad = cantidad;
+	printf("Rehasheee!\n");
 	return EXITO;
 }
 
 int hash_insertar(hash_t* hash, const char* clave, void* elemento){
 	if(!hash) return ERROR;
 	
-	size_t posicion;
 	int estado = ERROR;
+	size_t posicion;
+	size_t cantidad = 0;
 	cosa_t* cosa;
+	cosa_t* cosa_del_hash = NULL;
+	float carga = factor_carga(hash);
+	bool agregue_a_existente = false;
 
-	if(factor_carga(hash) >= FACTOR_CARGA){
+	if(carga >= FACTOR_CARGA){
 		estado = redimensionar_vector_listas(hash);
 		if(estado == ERROR){
 			return estado;
@@ -134,8 +144,22 @@ int hash_insertar(hash_t* hash, const char* clave, void* elemento){
 	cosa = crear_cosa(elemento, clave);
 	if(cosa){
 		posicion = hashing(hash->tamanio, cosa);
-		lista_insertar(hash->indice[posicion], cosa);
-		hash->cantidad++;
+		cantidad = lista_elementos(hash->indice[posicion]);
+		for(size_t i = 0; i < cantidad; i++){
+			cosa_del_hash = (cosa_t*)lista_elemento_en_posicion(hash->indice[posicion], i);
+			if(cosa_del_hash){
+				if(strcmp(cosa->clave, cosa_del_hash->clave)== 0){
+					destruir_cosa(cosa_del_hash, hash->destructor);
+					lista_borrar_de_posicion(hash->indice[posicion], i);
+					lista_insertar_en_posicion(hash->indice[posicion], cosa, i);
+					agregue_a_existente = true;
+				}
+			}
+		}
+		if(!agregue_a_existente){
+			lista_insertar(hash->indice[posicion], cosa);
+			hash->cantidad++;
+		}
 		estado = EXITO;
 	}else{
 		estado = ERROR;
@@ -148,21 +172,25 @@ int hash_quitar(hash_t* hash, const char* clave){
 
 	size_t posicion;
 	size_t cantidad_elementos;
-	cosa_t* cosa_del_hash = NULL;
+	cosa_t* cosa_del_hash;
 	cosa_t aux = {"", NULL};
 	int estado = ERROR;
 
-	strcpy(aux.clave, clave);
+	aux.clave = str_dup_c99(clave);
 	posicion = hashing(hash->tamanio, &aux);
 	cantidad_elementos = lista_elementos(hash->indice[posicion]);
 	for(size_t i = 0; i < cantidad_elementos; i++){
 		cosa_del_hash = (cosa_t*)lista_elemento_en_posicion(hash->indice[posicion], i);
-		if(strcmp(cosa_del_hash->clave, aux.clave) == 0){
-			lista_borrar_de_posicion(hash->indice[posicion], i);
-			destruir_cosa(cosa_del_hash, hash->destructor);
-			estado = EXITO;
+		if(cosa_del_hash){
+			if(strcmp(cosa_del_hash->clave, aux.clave) == 0){
+				lista_borrar_de_posicion(hash->indice[posicion], i);
+				destruir_cosa(cosa_del_hash, hash->destructor);
+				hash->cantidad--;
+				estado = EXITO;
+			}
 		}
 	}
+	free(aux.clave);
 	return estado;
 }
 /////////////////////////////////////////////////////////////////HASH CONTIENE/////////////////////////////////////////////////////////////////
@@ -175,15 +203,18 @@ bool hash_contiene(hash_t* hash, const char* clave){
 
 	if(!hash) return encontre;
 
-	strcpy(aux.clave, clave);
+	aux.clave = str_dup_c99(clave);
 	posicion = hashing(hash->tamanio, &aux);
 	cantidad_elementos = lista_elementos(hash->indice[posicion]);
 	for(size_t i = 0; i < cantidad_elementos; i++){
-		cosa_del_hash = (cosa_t*)lista_elemento_en_posicion(hash->indice[posicion], i);
-		if(strcmp(cosa_del_hash->clave, aux.clave) == 0){
-			encontre = true;
+		if(cosa_del_hash){
+			cosa_del_hash = (cosa_t*)lista_elemento_en_posicion(hash->indice[posicion], i);
+			if(strcmp(cosa_del_hash->clave, aux.clave) == 0){
+				encontre = true;
+			}
 		}
 	}
+	free(aux.clave);
 	return encontre;
 }
 /////////////////////////////////////////////////////////////////HASH OBTENER/////////////////////////////////////////////////////////////////
@@ -208,6 +239,9 @@ void* hash_obtener(hash_t* hash, const char* clave){
 }
 /////////////////////////////////////////////////////////////////HASH CANTIDAD/////////////////////////////////////////////////////////////////
 size_t hash_cantidad(hash_t* hash){
+	printf("Cantidad: %zu\n", hash->cantidad);
+	printf("tamanio: %zu\n", hash->tamanio);
+	
 	return hash->cantidad;
 }
 /////////////////////////////////////////////////////////////////HASH DESTRUIR/////////////////////////////////////////////////////////////////
