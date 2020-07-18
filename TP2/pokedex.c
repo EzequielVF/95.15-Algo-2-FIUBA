@@ -113,7 +113,6 @@ void destructor_de_cosas(void* elemento){
 pokedex_t* pokedex_crear(char entrenador[MAX_NOMBRE]){
     pokedex_t* pokedex = NULL;
     pokedex = malloc(sizeof(pokedex_t));
-
     if(!pokedex)
         return NULL;
 
@@ -227,7 +226,9 @@ int pokedex_avistar(pokedex_t* pokedex, char ruta_archivo[MAX_RUTA]){
 void leer_evoluciones(int* leido, int* numero_especie_original, char* nombre_especie_nueva, char* descripcion_especie_nueva, char* nombre_pokemon, int* numero_especie_nueva, FILE* evolucionestxt){
     (*leido) = fscanf(evolucionestxt, FORMATO_LECTURA_EVOLUCIONES, numero_especie_original, nombre_pokemon, numero_especie_nueva, nombre_especie_nueva, descripcion_especie_nueva);
 }
-
+/*
+ * Busca y si encuentra el pokemon buscado, lo devuelve, actualiza el booleano y guarda la posicion en la que esta el pokemon.
+ */
 particular_pokemon_t* buscar_pokemon_a_evolucionar(especie_pokemon_t* especie_en_pokedex, bool* pokemon_encontrado, size_t* posicion_pokemon, size_t* i, particular_pokemon_t pokemon_leido){
     particular_pokemon_t* pokemon_aux;
     size_t cantidad;
@@ -409,7 +410,7 @@ bool escribir_elemento(void* elemento, void* extra){
     size_t cantidad = 0;
 
 	if(elemento){
-        fprintf(pokedextxt, "E;%s;%i;%s\n", cosa->nombre, cosa->numero, cosa->descripcion);
+        fprintf(pokedextxt, "E;%i;%s;%s\n", cosa->numero, cosa->nombre, cosa->descripcion);
         cantidad = lista_elementos(cosa->pokemones);
         for(size_t i = 0; i < cantidad; i++){
             pokemon = (particular_pokemon_t*)lista_elemento_en_posicion(cosa->pokemones, i);
@@ -463,7 +464,7 @@ pokedex_t* pokedex_prender(){
     leido = fscanf(pokedextxt, "%c;", &letra_indice);
     while(leido == 1){
         if(letra_indice == 'E'){
-            fscanf(pokedextxt, "%[^;];%i;%[^\n]\n", especie, &numero_especie, descripcion_especie);
+            fscanf(pokedextxt, "%i;%[^;];%[^\n]\n", &numero_especie, especie, descripcion_especie);
             especie_leida = crear_especie(numero_especie, especie, descripcion_especie);
             arbol_insertar(aux->pokemones, especie_leida);
         }else{

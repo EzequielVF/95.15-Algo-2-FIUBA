@@ -162,15 +162,26 @@ int main(){
                 /////////////////////////////////////////////////////////////////////////////////////
             }else if(letra == 'C'){
                 /////////////////////////////////////////////////////////////////////////////////////
-                printf(ANSI_COLOR_GREEN"Ultimos pokemones capturados:\n"ANSI_COLOR_RESET);
-                pokedex_ultimos_capturados(pokedex);
-                printf(ANSI_COLOR_YELLOW"/***********************************/\n"ANSI_COLOR_RESET);
+                
+                if(pokedex->ultimos_capturados){
+                    printf(ANSI_COLOR_GREEN"Ultimos pokemones capturados:\n"ANSI_COLOR_RESET);
+                    pokedex_ultimos_capturados(pokedex);
+                    printf(ANSI_COLOR_YELLOW"/***********************************/\n"ANSI_COLOR_RESET);
+                }else{
+                    printf(ANSI_COLOR_RED"La pila se encuentra vacia, se reviso recientemente o no se ha avistado nuevos pokemones.\n"ANSI_COLOR_RESET);
+                    printf(ANSI_COLOR_YELLOW"/***********************************/\n"ANSI_COLOR_RESET);
+                }
                 /////////////////////////////////////////////////////////////////////////////////////
             }else if(letra == 'V'){
                 /////////////////////////////////////////////////////////////////////////////////////
-                printf(ANSI_COLOR_GREEN"Ultimos pokemones visto:\n"ANSI_COLOR_RESET);
-                pokedex_ultimos_vistos(pokedex);
-                printf(ANSI_COLOR_YELLOW"/***********************************/\n"ANSI_COLOR_RESET);
+                if(pokedex->ultimos_vistos){
+                    printf(ANSI_COLOR_GREEN"Ultimos pokemones visto:\n"ANSI_COLOR_RESET);
+                    pokedex_ultimos_vistos(pokedex);
+                    printf(ANSI_COLOR_YELLOW"/***********************************/\n"ANSI_COLOR_RESET);
+                }else{
+                    printf(ANSI_COLOR_RED"La cola se encuentra vacia, se reviso recientemente o no se ha avistado nuevos pokemones.\n"ANSI_COLOR_RESET);
+                    printf(ANSI_COLOR_YELLOW"/***********************************/\n"ANSI_COLOR_RESET);
+                }
                 /////////////////////////////////////////////////////////////////////////////////////
             }else if(letra == 'M'){
                 /////////////////////////////////////////////////////////////////////////////////////
