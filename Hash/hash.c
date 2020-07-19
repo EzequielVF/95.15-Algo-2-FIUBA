@@ -1,5 +1,6 @@
 #include "lista.h"
 #include "hash.h"
+#include "hash_iterador.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -18,6 +19,14 @@ struct hash{
 		size_t tamanio;
 		lista_t** indice;
 		hash_destruir_dato_t destructor;
+};
+
+struct hash_iter{
+    hash_t* hash;
+	lista_iterador_t** iterador_lista;
+	size_t contador_ite;
+	size_t posicion;
+	size_t tamanio;
 };
 
 typedef struct cosa{
@@ -49,8 +58,8 @@ size_t hashing(size_t tamanio, cosa_t* cosa){
 	for(size_t i = 0; i< posicion; i++){
 		suma += (size_t)(cosa->clave[i]);
 	}
-	suma*=suma;
-	posicion = suma%(tamanio+1);
+	suma= (suma*2)+1;
+	posicion = suma%(tamanio);
 	return posicion;
 }
 
@@ -120,7 +129,6 @@ int redimensionar_vector_listas(hash_t* hash){
 	hash->indice = nuevo_indice;
 	hash->tamanio = nuevo_tamanio;
 	hash->cantidad = cantidad;
-	printf("Rehasheee!\n");
 	return EXITO;
 }
 
@@ -207,11 +215,9 @@ bool hash_contiene(hash_t* hash, const char* clave){
 	posicion = hashing(hash->tamanio, &aux);
 	cantidad_elementos = lista_elementos(hash->indice[posicion]);
 	for(size_t i = 0; i < cantidad_elementos; i++){
-		if(cosa_del_hash){
-			cosa_del_hash = (cosa_t*)lista_elemento_en_posicion(hash->indice[posicion], i);
-			if(strcmp(cosa_del_hash->clave, aux.clave) == 0){
-				encontre = true;
-			}
+		cosa_del_hash = (cosa_t*)lista_elemento_en_posicion(hash->indice[posicion], i);
+		if(strcmp(cosa_del_hash->clave, aux.clave) == 0){
+			encontre = true;
 		}
 	}
 	free(aux.clave);
@@ -226,28 +232,38 @@ void* hash_obtener(hash_t* hash, const char* clave){
 	cosa_t* cosa_del_hash = NULL;
 	cosa_t aux = {"", NULL};
 
-	strcpy(aux.clave, clave);
+	aux.clave = str_dup_c99(clave);
 	posicion = hashing(hash->tamanio, &aux);
 	cantidad_elementos = lista_elementos(hash->indice[posicion]);
 	for(size_t i = 0; i < cantidad_elementos; i++){
 		cosa_del_hash = (cosa_t*)lista_elemento_en_posicion(hash->indice[posicion], i);
 		if(strcmp(cosa_del_hash->clave, aux.clave) == 0){
+			free(aux.clave);
 			return cosa_del_hash->elemento;
 		}
 	}
+	free(aux.clave);
 	return NULL;
 }
 /////////////////////////////////////////////////////////////////HASH CANTIDAD/////////////////////////////////////////////////////////////////
 size_t hash_cantidad(hash_t* hash){
-	printf("Cantidad: %zu\n", hash->cantidad);
-	printf("tamanio: %zu\n", hash->tamanio);
-	
 	return hash->cantidad;
 }
 /////////////////////////////////////////////////////////////////HASH DESTRUIR/////////////////////////////////////////////////////////////////
+void ver_dispersion(hash_t* hash){
+	size_t i = 0;
+	size_t tamanio = hash->tamanio;
+	while(i < tamanio){
+		printf("Espacio = %zu, tiene %zu autos.\n", i, lista_elementos(hash->indice[i]));
+		i++;
+	}
+}
+
 void hash_destruir(hash_t* hash){
 	size_t tamanio = hash->tamanio;
 	cosa_t* aux = NULL;
+
+	ver_dispersion(hash); //ES PARA PRUEBAS
 
 	for(size_t i = 0; i < tamanio; i++){
 		if(hash->indice[i]){
@@ -286,3 +302,98 @@ size_t hash_con_cada_clave(hash_t* hash, bool (*funcion)(hash_t* hash, const cha
 	}
 	return contador;
 }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+hash_iterador_t* hash_iterador_crear(hash_t* hash){
+    if(!hash) return NULL;
+
+    hash_iterador_t* iterador = malloc(sizeof(hash_iterador_t));
+    if(!iterador) return NULL;
+
+    iterador->hash = hash;
+	lista_iterador_t** aux = malloc(sizeof(lista_iterador_t*)*(hash->tamanio));
+	if(!aux){
+		free(iterador);
+		return NULL;
+	}
+	
+	iterador->iterador_lista = aux;
+	for(size_t i = 0; i< iterador->hash->tamanio; i++){
+		if(iterador->hash->indice[i]){
+			iterador->iterador_lista[i] = lista_iterador_crear(iterador->hash->indice[i]);
+		}
+	}
+	iterador->posicion = 0;
+	iterador->contador_ite = 0;
+	iterador->tamanio = hash->tamanio;
+	
+	/*
+	iterador->hash = hash;
+    iterador->iterador_lista = NULL;
+    size_t posicion = 0;
+	bool estableci_inicio = false;
+    while(posicion < iterador->hash->tamanio && !estableci_inicio){
+		if(iterador->hash->indice[posicion]){
+			if(!lista_vacia(iterador->hash->indice[posicion])){
+				iterador->posicion = posicion;
+				iterador->iterador_lista = lista_iterador_crear(iterador->hash->indice[posicion]);
+				estableci_inicio = true;
+			}
+		}
+		posicion++;
+    }
+	iterador->contador_ite = ORIGEN;*/
+	return iterador;
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+const char* hash_iterador_siguiente(hash_iterador_t* iterador){
+	if(!iterador) return NULL;
+
+	size_t posicion = iterador->posicion;
+	bool encontre = false;
+	if(hash_iterador_tiene_siguiente(iterador)){
+		cosa_t* aux = (cosa_t*)lista_iterador_siguiente(iterador->iterador_lista[posicion]);
+		if(aux){
+			return aux->clave;
+		}else{
+			while(!encontre){
+				posicion++;
+				aux = (cosa_t*)lista_iterador_siguiente(iterador->iterador_lista[posicion]);
+				if(aux){
+					iterador->posicion = posicion;
+					encontre = true;
+					return aux->clave;
+				}
+			}
+		}
+	}
+	return NULL;
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bool hash_iterador_tiene_siguiente(hash_iterador_t* iterador){
+	if(!iterador) return false;
+
+	size_t posicion = iterador->posicion;
+	if(lista_iterador_tiene_siguiente(iterador->iterador_lista[posicion])){
+		return true;
+	}else{
+		posicion++;
+		while(posicion < iterador->tamanio){
+			if(lista_iterador_tiene_siguiente(iterador->iterador_lista[posicion])){
+				return true;
+			}
+			posicion++;
+		}
+	}
+	return false;
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void hash_iterador_destruir(hash_iterador_t* iterador){
+	if(!iterador) return;
+
+	for(size_t i = 0; i < iterador->tamanio; i++){
+		lista_iterador_destruir(iterador->iterador_lista[i]);
+	}
+	free(iterador->iterador_lista);
+	free(iterador);
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

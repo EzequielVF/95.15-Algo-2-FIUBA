@@ -315,7 +315,7 @@ lista_iterador_t* lista_iterador_crear(lista_t* lista){
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool lista_iterador_tiene_siguiente(lista_iterador_t* iterador){
-    if(!iterador)
+    if(!iterador || lista_vacia(iterador->lista))
         return false;
     
     bool tiene_siguiente = false;
@@ -329,7 +329,7 @@ bool lista_iterador_tiene_siguiente(lista_iterador_t* iterador){
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void* lista_iterador_siguiente(lista_iterador_t* iterador){
-    if(!iterador)
+    if(!iterador || lista_vacia(iterador->lista))
         return NULL;
 
     void* elemento;
