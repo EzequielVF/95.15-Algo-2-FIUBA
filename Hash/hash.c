@@ -15,10 +15,10 @@
 #define VACIO 0
 /////////////////////////////////////////////////////////////////STRUCTS///////////////////////////////////////////////////////////////////
 struct hash{
-		size_t cantidad;
-		size_t tamanio;
-		lista_t** indice;
-		hash_destruir_dato_t destructor;
+	size_t cantidad;
+	size_t tamanio;
+	lista_t** indice;
+	hash_destruir_dato_t destructor;
 };
 
 struct hash_iter{
@@ -133,7 +133,7 @@ int redimensionar_vector_listas(hash_t* hash){
 }
 
 int hash_insertar(hash_t* hash, const char* clave, void* elemento){
-	if(!hash) return ERROR;
+	if(!hash || !clave) return ERROR;
 	
 	int estado = ERROR;
 	size_t posicion;
@@ -176,7 +176,7 @@ int hash_insertar(hash_t* hash, const char* clave, void* elemento){
 }
 //////////////////////////////////////////////////////////////////HASH QUITAR//////////////////////////////////////////////////////////////////
 int hash_quitar(hash_t* hash, const char* clave){
-	if(!hash) return ERROR;
+	if(!hash || !clave) return ERROR;
 
 	size_t posicion;
 	size_t cantidad_elementos;
@@ -208,8 +208,8 @@ bool hash_contiene(hash_t* hash, const char* clave){
 	bool encontre = false;
 	cosa_t* cosa_del_hash = NULL;
 	cosa_t aux = {"", NULL};
-
-	if(!hash) return encontre;
+	
+	if(!hash || !clave) return encontre;
 
 	aux.clave = str_dup_c99(clave);
 	posicion = hashing(hash->tamanio, &aux);
@@ -225,7 +225,7 @@ bool hash_contiene(hash_t* hash, const char* clave){
 }
 /////////////////////////////////////////////////////////////////HASH OBTENER/////////////////////////////////////////////////////////////////
 void* hash_obtener(hash_t* hash, const char* clave){
-	if(!hash) return NULL;
+	if(!hash || !clave) return NULL;
 
 	size_t posicion;
 	size_t cantidad_elementos;
@@ -247,23 +247,14 @@ void* hash_obtener(hash_t* hash, const char* clave){
 }
 /////////////////////////////////////////////////////////////////HASH CANTIDAD/////////////////////////////////////////////////////////////////
 size_t hash_cantidad(hash_t* hash){
+	if(!hash) return 0;
+	
 	return hash->cantidad;
 }
 /////////////////////////////////////////////////////////////////HASH DESTRUIR/////////////////////////////////////////////////////////////////
-void ver_dispersion(hash_t* hash){
-	size_t i = 0;
-	size_t tamanio = hash->tamanio;
-	while(i < tamanio){
-		printf("Espacio = %zu, tiene %zu autos.\n", i, lista_elementos(hash->indice[i]));
-		i++;
-	}
-}
-
 void hash_destruir(hash_t* hash){
 	size_t tamanio = hash->tamanio;
 	cosa_t* aux = NULL;
-
-	ver_dispersion(hash); //ES PARA PRUEBAS
 
 	for(size_t i = 0; i < tamanio; i++){
 		if(hash->indice[i]){
@@ -325,23 +316,6 @@ hash_iterador_t* hash_iterador_crear(hash_t* hash){
 	iterador->posicion = 0;
 	iterador->contador_ite = 0;
 	iterador->tamanio = hash->tamanio;
-	
-	/*
-	iterador->hash = hash;
-    iterador->iterador_lista = NULL;
-    size_t posicion = 0;
-	bool estableci_inicio = false;
-    while(posicion < iterador->hash->tamanio && !estableci_inicio){
-		if(iterador->hash->indice[posicion]){
-			if(!lista_vacia(iterador->hash->indice[posicion])){
-				iterador->posicion = posicion;
-				iterador->iterador_lista = lista_iterador_crear(iterador->hash->indice[posicion]);
-				estableci_inicio = true;
-			}
-		}
-		posicion++;
-    }
-	iterador->contador_ite = ORIGEN;*/
 	return iterador;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

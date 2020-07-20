@@ -1,5 +1,5 @@
 #include "hash.h"
-//#include "hash_iterador.h"
+#include "hash_iterador.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -66,24 +66,18 @@ int main(){
   guardar_vehiculo(garage, "BD123AC", "Auto de Pablo");
   guardar_vehiculo(garage, "CD442AA", "Auto de Micaela");
   guardar_vehiculo(garage, "PQO697", "Auto de Juan");
-  hash_cantidad(garage);
   guardar_vehiculo(garage, "DZE443", "Auto de Jonathan otra vez");
-  hash_cantidad(garage);
   guardar_vehiculo(garage, "AC152AD", "Auto de Agustina otra vez");
-  hash_cantidad(garage);
 
   verificar_vehiculo(garage, "QDM443", true);
   verificar_vehiculo(garage, "PQO697", true);
 
-  hash_cantidad(garage);
   quitar_vehiculo(garage, "QDM443");
-  hash_cantidad(garage);
   quitar_vehiculo(garage, "PQO697");
-  hash_cantidad(garage);
 
   verificar_vehiculo(garage, "QDM443", false);
   verificar_vehiculo(garage, "PQO697", false);
-/*
+
   hash_iterador_t* iter = hash_iterador_crear(garage);
   size_t listados = 0;
 
@@ -100,7 +94,7 @@ int main(){
   hash_iterador_destruir(iter);
 
   size_t impresas = hash_con_cada_clave(garage, mostrar_patente, NULL);
-  printf("Se mostraron %zu patentes con el iterador interno\n\n", impresas);*/
+  printf("Se mostraron %zu patentes con el iterador interno\n\n", impresas);
   
   hash_destruir(garage);
   
