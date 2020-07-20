@@ -45,8 +45,8 @@ que se presentaron colisiones.
 Exploracion de posicion: Si se presenta una colicion el hash buscara alojar el elemento en el proximo
 espacio disponible.
 
-El Rehash es cuando el hash para cierto margen de carga, entonces se procede a agrandarlo
-volviendoa pasar por las funcion de hash todos los elementos dentro de este para asignarles 
+El Rehash es cuando el hash pasa cierto margen de carga, entonces se procede a agrandarlo
+volviendo a pasar por las funcion de hash todos los elementos dentro de este para asignarles 
 una posicion en de acuerdo al nuevo tamaño disponible.
 Es importante ya que permite bajar la tasa de colisiones dentro del hash, y quela tasa de colisiones
 se matenga baja permite mantener los buenos tiempoes de busqueda y insercion que se buscan tenercon 
