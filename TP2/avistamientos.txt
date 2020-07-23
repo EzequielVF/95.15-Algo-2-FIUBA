@@ -1,4 +1,4 @@
-25;Pikachu;Pikachu es un raton...;Kachu;15;N
+25;Pikachu;Pikachu es un raton...;Kachu;15;S
 46;Paras;Paras es un bichito...;Parrrras;12;S
 25;Pikachu;Pikachu es un raton...;Pikacha;20;N
 12;Butterfree;Butterfree es una mariposa...;Danaus;23;S
@@ -6,3 +6,19 @@
 35;Clefairy;Clefairy es muy rosa...;Cleffinha;13;S
 25;Pikachu;Pikachu es un raton...;Pikante;39;S
 8;Wartortle;Wartortle es la tortuga...;Trotu;10;N
+1;Bulbasaur;Senior platitas;Coliflor;20;S
+4;Charmander;Charmander tiene fuego en su cola;Fosforito;30;S
+10;Caterpie;Caterpie es un gusanito;Gusanito;2;N
+14;Kakuna;Kanuna matata;Kakunita;4;S
+18;Pidgeot;Pidgeot es como una gallina;Pollito;45;S
+19;Rattata;Es un Ratata no hay mucho mas que decir;Charly;11;S
+24;Arbok;Arbok es una serpiente violeta;Cascabel;16;S
+31;Nidorina;Nidoran es un... noseque;Mandarina;27;N
+39;Jygglypuff;Jygglypuff es una cochita linda;Malvadisco;5;S
+48;Venonat;Vanonat es un......;Venenoso;7;S
+6;Charizard;Charizard es el mejor pokemon;Charizard;80;S
+9;Blastoise;Blastoise queseyo tira agua con 2 caniones;Blastoise;74;S
+52;Meowth;Meowth es un gato;Meowth;4;N
+54;Psyduck;Psyduck es un pato;Pato;8;N
+68;Machamp;Machamp es un boxeador;Boxy;44;N
+80;Slowpoke;Slowpoke es un gordito rosa;Slowy;30;N

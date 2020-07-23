@@ -1,15 +1,49 @@
 unknown
 E;25;Pikachu;Pikachu es un raton...
-P;Kachu;15;N
 P;Pikacha;20;N
 P;Pikante;39;S
 E;12;Butterfree;Butterfree es una mariposa...
 P;Danaus;23;S
 E;8;Wartortle;Wartortle es la tortuga...
 P;Trotu;10;N
+E;1;Bulbasaur;Senior platitas
+P;Coliflor;20;S
+E;4;Charmander;Charmander tiene fuego en su cola
+P;Fosforito;30;S
+E;6;Charizard;Charizard es el mejor pokemon
+P;Charizard;80;S
+E;10;Caterpie;Caterpie es un gusanito
+P;Gusanito;2;N
+E;9;Blastoise;Blastoise queseyo tira agua con 2 caniones
+P;Blastoise;74;S
 E;19;Rattata;Rattata es otra rata...
 P;Colagusano;30;N
+P;Charly;11;S
+E;14;Kakuna;Kanuna matata
+P;Kakunita;4;S
+E;18;Pidgeot;Pidgeot es como una gallina
+P;Pollito;45;S
+E;24;Arbok;Arbok es una serpiente violeta
+P;Cascabel;16;S
 E;46;Paras;Paras es un bichito...
-P;Parrrras;12;S
 E;35;Clefairy;Clefairy es muy rosa...
+E;31;Nidorina;Nidoran es un... noseque
+P;Mandarina;27;N
+E;26;Raichu;Los Raichus también son ratones... ¡Cuantos ratones!
+P;Kachu;15;S
+E;39;Jygglypuff;Jygglypuff es una cochita linda
+P;Malvadisco;5;S
+E;36;Clefable;Los Clefable tambien son rosados...
 P;Cleffinha;13;S
+E;48;Venonat;Vanonat es un......
+P;Venenoso;7;S
+E;47;Parasect;Parasect  es un Parasect
+P;Parrrras;12;S
+E;52;Meowth;Meowth es un gato
+P;Meowth;4;N
+E;54;Psyduck;Psyduck es un pato
+P;Pato;8;N
+E;68;Machamp;Machamp es un boxeador
+P;Boxy;44;N
+E;80;Slowpoke;Slowpoke es un gordito rosa
+P;Slowy;30;N

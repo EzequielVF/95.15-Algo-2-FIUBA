@@ -13,6 +13,7 @@
 #define ANSI_COLOR_MAGENTA "\x1b[35m"
 #define ANSI_COLOR_CYAN    "\x1b[36m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
+#define ESPECIE 'E'
 #define ERROR -1
 #define EXITO 0
 #define FORMATO_LECTURA_AVISTAMIENTOS "%i;%[^;];%[^;];%[^;];%i;%c\n"
@@ -298,6 +299,9 @@ int pokedex_evolucionar(pokedex_t* pokedex, char ruta_archivo[MAX_RUTA]){
             especie_a_evolucionar_en_pokedex = (especie_pokemon_t*)arbol_buscar(pokedex->pokemones, especie_nueva);
             mover_pokemon_de_especie_a_especie(pokedex, especie_en_pokedex, especie_nueva, especie_a_evolucionar_en_pokedex, &inserto_pokemon, &problemas_asignacion, posicion_pokemon, pokemon_aux);
         }
+        if(!pokemon_encontrado || !especie_en_pokedex){
+            problemas_asignacion = true;
+        }
         inserto_pokemon = false;
         pokemon_encontrado = false;
         i = 0;
@@ -463,7 +467,7 @@ pokedex_t* pokedex_prender(){
     aux = pokedex_crear(nombre);
     leido = fscanf(pokedextxt, "%c;", &letra_indice);
     while(leido == 1){
-        if(letra_indice == 'E'){
+        if(letra_indice == ESPECIE){
             fscanf(pokedextxt, "%i;%[^;];%[^\n]\n", &numero_especie, especie, descripcion_especie);
             especie_leida = crear_especie(numero_especie, especie, descripcion_especie);
             arbol_insertar(aux->pokemones, especie_leida);

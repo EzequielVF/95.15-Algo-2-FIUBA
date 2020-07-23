@@ -158,7 +158,8 @@ int main(){
                     printf(ANSI_COLOR_GREEN"Pokemones evolucionados exitosamente!\n"ANSI_COLOR_RESET);
                     printf(ANSI_COLOR_YELLOW"/***********************************/\n"ANSI_COLOR_RESET);
                 }else{
-                    printf(ANSI_COLOR_RED"Error al evolucionar los pokemones!\n"ANSI_COLOR_RESET);
+                    printf(ANSI_COLOR_RED"Error al evolucionar algunos de los pokemones!\n"ANSI_COLOR_RESET);
+                    printf(ANSI_COLOR_RED"Solo pudieron evolucionarse a los pokemones validos!\n"ANSI_COLOR_RESET);
                     printf(ANSI_COLOR_YELLOW"/***********************************/\n"ANSI_COLOR_RESET);
                 }
                 /////////////////////////////////////////////////////////////////////////////////////
