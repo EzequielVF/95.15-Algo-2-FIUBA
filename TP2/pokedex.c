@@ -57,7 +57,7 @@ particular_pokemon_t* crear_pokemon(char* nombre, int nivel, char capturado){
     return aux;
 }
 /*
- *
+ * Recibe dos elementos y los compara.
  */
 int comparar_cosas(void* elemento1, void* elemento2){
 	if(!elemento1 || !elemento2)
@@ -72,7 +72,7 @@ int comparar_cosas(void* elemento1, void* elemento2){
 	return 0;
 }
 /*
- * 
+ * Recibe una especie valida y se encarga liberar la memoria reservada por este.
  */
 void destruir_cosa(especie_pokemon_t* elemento){
 	size_t cantidad = lista_elementos(elemento->pokemones);
