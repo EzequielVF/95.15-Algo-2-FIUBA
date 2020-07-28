@@ -105,8 +105,40 @@ float factor_carga(hash_t* hash){
 	return factor;
 }
 
+bool es_primo_r(size_t n, size_t x){
+	if(x == 1)
+		return true;
+
+	if(n % x == 0)
+		return false;
+
+	return es_primo_r(n, x-1);
+}
+
+bool es_primo(size_t n){
+	if(n < 2) return false;
+
+	return es_primo_r(n, n-1);
+}
+
+size_t nuevo_tamanio_hash(size_t tamanio_viejo){
+	size_t nuevo_tamanio = tamanio_viejo*2;
+	bool encontrado = false;
+	if(es_primo(nuevo_tamanio)){
+		encontrado = true;
+	}else{
+		while(!encontrado){
+			nuevo_tamanio++;
+			if(es_primo(nuevo_tamanio)){
+				encontrado = true;
+			}
+		}
+	}
+	return nuevo_tamanio;
+}
+
 int redimensionar_vector_listas(hash_t* hash){
-	size_t nuevo_tamanio = ((hash->tamanio)*2)+1;
+	size_t nuevo_tamanio = nuevo_tamanio_hash(hash->tamanio);
 	size_t cantidad = hash->cantidad;
 	lista_t** nuevo_indice = malloc(sizeof(lista_t*)*nuevo_tamanio);
 	if(!nuevo_indice) return ERROR;
