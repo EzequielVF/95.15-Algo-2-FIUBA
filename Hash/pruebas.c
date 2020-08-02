@@ -63,6 +63,7 @@ void pruebas_hash_null(pa2m_t* probador){
     pa2m_asegurar(probador, "Devuelve que tiene 0 elementos un hash NULL:", hash_cantidad(garage) == 0);
     pa2m_asegurar(probador, "Error al usar iterador interno con hash NULL:", hash_con_cada_clave(garage, mostrar_patente, NULL) == 0);
     pa2m_asegurar(probador, "Error al crear el iterador externo:", hash_iterador_crear(garage) == NULL);
+    hash_destruir(garage);
     printf("*********************************************\n");
     pa2m_mostrar_estadisticas(probador);
     printf("*********************************************\n");

@@ -285,6 +285,8 @@ size_t hash_cantidad(hash_t* hash){
 }
 /////////////////////////////////////////////////////////////////HASH DESTRUIR/////////////////////////////////////////////////////////////////
 void hash_destruir(hash_t* hash){
+	if(!hash) return;
+	
 	size_t tamanio = hash->tamanio;
 	cosa_t* aux = NULL;
 
