@@ -42,7 +42,9 @@ char* str_dup_c99(const char* s){
   strcpy(p,s);
   return p;
 }
-
+/*
+ * Crea una estructura con el elemento y la clave recibidas.
+ */
 cosa_t* crear_cosa(void* elemento, const char* clave){
 	if(!clave) return NULL;
 	
@@ -53,7 +55,9 @@ cosa_t* crear_cosa(void* elemento, const char* clave){
 	aux->elemento = elemento;
 	return aux;
 }
-
+/*
+ * Recibe una "cosa" y le asigna una posicion determinada.
+ */
 size_t hashing(size_t tamanio, cosa_t* cosa){
 	size_t posicion = strlen(cosa->clave);
 	size_t suma = 0;
@@ -64,11 +68,15 @@ size_t hashing(size_t tamanio, cosa_t* cosa){
 	posicion = suma%(tamanio);
 	return posicion;
 }
-
+/*
+ * Destruye la cosa, aplicado el destructor al elemento, ademas de liberar la memoria reservada para la clave y la cosa.
+ */
 void destruir_cosa(cosa_t* cosa, hash_destruir_dato_t destructor){
-	if(!destructor) return;
+	if(!cosa) return;
 
-	destructor(cosa->elemento);
+	if(destructor){
+		destructor(cosa->elemento);	
+	}
 	free(cosa->clave);
 	free(cosa);
 }
@@ -99,6 +107,9 @@ hash_t* hash_crear(hash_destruir_dato_t destruir_elemento, size_t capacidad){
 	return aux;
 }
 //////////////////////////////////////////////////////////////////HASH INSERTAR////////////////////////////////////////////////////////////////////
+/*
+ * Determina el factor de carga del hash.
+ */
 float factor_carga(hash_t* hash){
 	float factor = 0;
 	float cantidad = (float)hash->cantidad;
@@ -106,7 +117,9 @@ float factor_carga(hash_t* hash){
 	factor = (float)(cantidad/tamnio);
 	return factor;
 }
-
+/*
+ * 
+ */
 bool es_primo_r(size_t n, size_t x){
 	if(x == 1)
 		return true;
@@ -116,13 +129,18 @@ bool es_primo_r(size_t n, size_t x){
 
 	return es_primo_r(n, x-1);
 }
-
+/*
+ * 
+ */
 bool es_primo(size_t n){
 	if(n < 2) return false;
 
 	return es_primo_r(n, n-1);
 }
-
+/*
+ * Duplica el tamanio del hash actual y apartir de ahi busca un primo,
+ * cuando lo encuentra lo devuelve.
+ */
 size_t nuevo_tamanio_hash(size_t tamanio_viejo){
 	size_t nuevo_tamanio = tamanio_viejo*2;
 	bool encontrado = false;
@@ -138,7 +156,10 @@ size_t nuevo_tamanio_hash(size_t tamanio_viejo){
 	}
 	return nuevo_tamanio;
 }
-
+/*
+ * Mueve los elementos del indice del hash a uno nuevo y luego lo remplaza
+ * dentro de la estructura del hash.
+ */
 int redimensionar_vector_listas(hash_t* hash){
 	size_t nuevo_tamanio = nuevo_tamanio_hash(hash->tamanio);
 	size_t cantidad = hash->cantidad;
