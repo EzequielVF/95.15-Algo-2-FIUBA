@@ -44,6 +44,8 @@ char* str_dup_c99(const char* s){
 }
 
 cosa_t* crear_cosa(void* elemento, const char* clave){
+	if(!clave) return NULL;
+	
 	cosa_t* aux = malloc(sizeof(cosa_t));
 	if(!aux) return NULL;
 
