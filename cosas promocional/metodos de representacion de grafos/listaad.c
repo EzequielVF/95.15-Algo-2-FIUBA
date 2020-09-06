@@ -13,10 +13,12 @@
 #define TERRAZA 6
 #define TORTUTA 7
 #define DESCONOCIDA 9999
+#define INFINITO 99999
 
 typedef struct nodo{
     struct nodo* sig;
     int identidad;
+    int peso;
 }nodo_t;
 
 typedef struct{
@@ -50,17 +52,18 @@ grafo_t* crear_grafo(int tamanio){
     return grafito;
 }
 
-void agregar_nodo(nodo_t* nodo, int v1){
+void agregar_nodo(nodo_t* nodo, int v1, int peso){
     if(nodo->sig == NULL){
         nodo->sig = crear_nodo();
         nodo->sig->identidad = v1;
+        nodo->sig->peso = peso;
         return;
     }
     if(nodo->sig != NULL){
         if(nodo->sig->identidad == v1){
             return;
         }else{
-            agregar_nodo(nodo->sig, v1);
+            agregar_nodo(nodo->sig, v1, peso);
         }
     }
 }
@@ -87,6 +90,8 @@ void grafo_agregar_arista(grafo_t* g, int v0, int v1, int peso){
                 g->vector[i]->identidad = v0;
                 g->vector[i]->sig = crear_nodo();
                 g->vector[i]->sig->identidad = v1;
+                g->vector[i]->peso = 0;
+                g->vector[i]->sig->peso = peso;
                 break;
             }
         }
@@ -97,15 +102,17 @@ void grafo_agregar_arista(grafo_t* g, int v0, int v1, int peso){
                 g->vector[i]->identidad = v1;
                 g->vector[i]->sig = crear_nodo();
                 g->vector[i]->sig->identidad = v0;
+                g->vector[i]->peso = 0;
+                g->vector[i]->sig->peso = peso;
                 break;
             }
         }
     }
     if(esta_v0){
-        agregar_nodo(g->vector[posicion_v0], v1);
+        agregar_nodo(g->vector[posicion_v0], v1, peso);
     }
     if(esta_v1){
-        agregar_nodo(g->vector[posicion_v1], v0);
+        agregar_nodo(g->vector[posicion_v1], v0, peso);
     }
 }
 
@@ -238,16 +245,79 @@ void destruir_grafo(grafo_t* g){
     free(g);
 }
 //////////////////////////////////////////////////////////////////////////////////////////
+typedef struct matriz{
+    int* adyacencias;
+    int cantidad;
+}matriz_t;
+
+void dejar_matriz_para_greedys(matriz_t* m){
+    for(int i = 0; i < m->cantidad; i++){
+        for(int j = 0; j < m->cantidad; j++){
+            m->adyacencias[j*m->cantidad + i] = INFINITO;
+            if(i == j)
+                m->adyacencias[j*m->cantidad + i] = 0;
+        }
+    }
+}
+
+void poner_relaciones_en_matriz(nodo_t* n, matriz_t* m, int v0){
+    if(!n) return;
+
+    int v1;
+    v1 = n->identidad;
+    m->adyacencias[(v0 * m->cantidad) + v1] = n->peso;
+    poner_relaciones_en_matriz(n->sig, m, v0);
+}
+
+void rellenar_matriz_con_elementos_en_lista(grafo_t* g, matriz_t* m){
+    int v0;
+    
+    for(int i = 0; i<g->cantidad; i++){
+        v0 = g->vector[i]->identidad;
+        poner_relaciones_en_matriz(g->vector[i]->sig, m, v0);
+    }
+}
+
+matriz_t* transformar_listaad_matrizad(grafo_t* g){
+    matriz_t* m = malloc(sizeof(matriz_t));
+    if(!m) return NULL;
+
+    m->cantidad = g->cantidad;
+    m->adyacencias = calloc(m->cantidad*m->cantidad, sizeof(int));
+    if(!(m->adyacencias)){
+        free(m);
+        return NULL;
+    }
+    //dejar_matriz_para_greedys(m);
+    rellenar_matriz_con_elementos_en_lista(g, m);
+
+    return m;
+}
+
+void mostrar_matriz(int* matriz, int n){
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < n; j++){
+            printf("%i\t", matriz[i+j*n]);   
+        }
+        printf("\n");
+    }
+}
+
+void matriz_liberar(matriz_t* g){
+    free(g->adyacencias);
+    free(g);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////
 int main(){
     grafo_t* g = crear_grafo(8);
     grafo_agregar_arista(g, ENTRADA, SALA, 1);
-    grafo_agregar_arista(g, SALA, COCINA, 1);
-    grafo_agregar_arista(g, SALA, BANIO, 1);
-    grafo_agregar_arista(g, SALA, JARDIN, 1);
-    grafo_agregar_arista(g, JARDIN, CALABOZO, 1);
-    grafo_agregar_arista(g, JARDIN, TERRAZA, 1);
-    grafo_agregar_arista(g, CALABOZO, TORTUTA, 1);
-    grafo_agregar_arista(g, TERRAZA, BANIO, 1);
+    grafo_agregar_arista(g, SALA, COCINA, 2);
+    grafo_agregar_arista(g, SALA, BANIO, 4);
+    grafo_agregar_arista(g, SALA, JARDIN, 4);
+    grafo_agregar_arista(g, JARDIN, CALABOZO, 7);
+    grafo_agregar_arista(g, JARDIN, TERRAZA, 2);
+    grafo_agregar_arista(g, CALABOZO, TORTUTA, 3);
+    grafo_agregar_arista(g, TERRAZA, BANIO, 3);
 
     acomodar_vector_grafo(g);
     mostrar_grafo(g);
@@ -258,6 +328,14 @@ int main(){
     grafo_bfs(g, 0);
     printf("-->BFS");
     printf("\n");
+
+    matriz_t* matriz;
+    matriz = transformar_listaad_matrizad(g);
+    printf("\n");
+    printf("Lista-->Matriz");
+    printf("\n");
+    mostrar_matriz(matriz->adyacencias, matriz->cantidad);
     destruir_grafo(g);
+    matriz_liberar(matriz);
     return 0;
 }

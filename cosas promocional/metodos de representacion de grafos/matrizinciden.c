@@ -12,6 +12,7 @@
 #define CALABOZO 5
 #define TERRAZA 6
 #define TORTUTA 7
+#define INFINITO 99999
 
 typedef struct{
     int* adyacencias;
@@ -45,8 +46,8 @@ void grafo_agregar_arista(grafo_t* g, int v0, int v1, int peso){
     }
     int p0 = (v0 + (g->cant_aristas-1)*(g->cantidad));
     int p1 = (v1 + (g->cant_aristas-1)*(g->cantidad));
-    g->adyacencias[p0] = 1;
-    g->adyacencias[p1] = 1;
+    g->adyacencias[p0] = peso;
+    g->adyacencias[p1] = peso;
 }
 
 void mostrar_matriz(int* matriz, int columnas, int aristas){
@@ -75,7 +76,7 @@ void liberar_elementos(elemento_t** elementos, int cantidad){
     free(elementos);
 }
 //////////////////////////////////////////////////////////////////////////////////////////
-void grafo_dfs(grafo_t* g, int v0){
+void grafo_bfs(grafo_t* g, int v0){
     bool visitados[g->cantidad];
     bool encolados[g->cantidad];
     memset(visitados, 0, sizeof(visitados));
@@ -95,9 +96,9 @@ void grafo_dfs(grafo_t* g, int v0){
         visitados[aux->cosa] = true;
         columna = aux->cosa;
         for(int i = 0; i < g->cant_aristas; i++){
-            if(g->adyacencias[columna + g->cantidad*i] == 1){
+            if(g->adyacencias[columna + g->cantidad*i] != 0){
                 for(int j = 0; j < g->cantidad; j++){
-                    if(j != columna && (g->adyacencias[j + g->cantidad*i] == 1)  && !visitados[j] && !encolados[j]){
+                    if(j != columna && (g->adyacencias[j + g->cantidad*i] != 0)  && !visitados[j] && !encolados[j]){
                         elementos[j] = crear_elemento(j);
                         lista_encolar(cola, elementos[j]);
                         encolados[j] = true;
@@ -110,7 +111,7 @@ void grafo_dfs(grafo_t* g, int v0){
     liberar_elementos(elementos, g->cantidad);
 }
 //////////////////////////////////////////////////////////////////////////////////////////
-void grafo_bfs(grafo_t* g, int v0){
+void grafo_dfs(grafo_t* g, int v0){
     bool visitados[g->cantidad];
     bool apilados[g->cantidad];
     memset(visitados, 0, sizeof(visitados));
@@ -130,9 +131,9 @@ void grafo_bfs(grafo_t* g, int v0){
         visitados[aux->cosa] = true;
         columna = aux->cosa;
         for(int i = 0; i < g->cant_aristas; i++){
-            if(g->adyacencias[columna + g->cantidad*i] == 1){
+            if(g->adyacencias[columna + g->cantidad*i] != 0){
                 for(int j = 0; j < g->cantidad; j++){
-                    if(j != columna && (g->adyacencias[j + g->cantidad*i] == 1)  && !visitados[j] && !apilados[j]){
+                    if(j != columna && (g->adyacencias[j + g->cantidad*i] != 0)  && !visitados[j] && !apilados[j]){
                         elementos[j] = crear_elemento(j);
                         lista_apilar(pila, elementos[j]);
                         apilados[j] = true;
@@ -150,17 +151,86 @@ void destruir_grafo(grafo_t* g){
     free(g);
 }
 //////////////////////////////////////////////////////////////////////////////////////////
+typedef struct matriz{
+    int* adyacencias;
+    int cantidad;
+}matriz_t;
+
+void agregar_arista_matriz(matriz_t* g, int v0, int v1, int peso){
+    int p0 = g->cantidad*v1+v0;
+    int p1 = g->cantidad*v0+v1;
+    g->adyacencias[p0] = peso;
+    g->adyacencias[p1] = peso;
+}
+
+void rellenar_matriz_con_elementos_en_incidencia(grafo_t* g, matriz_t* m){
+    bool encontro_v0 = false;
+    bool encontro_los_dos = false;
+    int v0 = -1;
+    int v1 = -1;
+    int peso;
+
+    for(int i = 0; i < g->cant_aristas; i++){
+        for(int j = 0; j < g->cantidad; j++){
+            if(encontro_v0 && g->adyacencias[i*g->cant_aristas + j] != 0){
+                v1 = j;
+                encontro_los_dos = true;
+            }
+            if((g->adyacencias[i*g->cant_aristas + j] != 0) && !encontro_v0){
+                encontro_v0 = true;
+                peso = g->adyacencias[i*g->cant_aristas + j];
+                v0 = j;
+            }
+            if(encontro_los_dos){
+                encontro_v0 = false;
+                encontro_los_dos = false;
+                agregar_arista_matriz(m, v0, v1, peso);
+                break;
+            }
+        }
+    }
+}
+
+matriz_t* transformar_matrizincidencia_matrizad(grafo_t* g){
+    matriz_t* m = malloc(sizeof(matriz_t));
+    if(!m) return NULL;
+
+    m->cantidad = g->cantidad;
+    m->adyacencias = calloc(m->cantidad*m->cantidad, sizeof(int));
+    if(!(m->adyacencias)){
+        free(m);
+        return NULL;
+    }
+    //dejar_matriz_para_greedys(m);
+    rellenar_matriz_con_elementos_en_incidencia(g, m);
+    return m;
+}
+
+void mostrar_adyacencia(int* matriz, int n){
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < n; j++){
+            printf("%i\t", matriz[i+j*n]);   
+        }
+        printf("\n");
+    }
+}
+
+void matriz_liberar(matriz_t* g){
+    free(g->adyacencias);
+    free(g);
+}
+//////////////////////////////////////////////////////////////////////////////////////////
 int main(){
     grafo_t* g = grafo_crear(8);
 
     grafo_agregar_arista(g, ENTRADA, SALA, 1);
-    grafo_agregar_arista(g, SALA, COCINA, 1);
-    grafo_agregar_arista(g, SALA, BANIO, 1);
-    grafo_agregar_arista(g, SALA, JARDIN, 1);
-    grafo_agregar_arista(g, JARDIN, CALABOZO, 1);
-    grafo_agregar_arista(g, JARDIN, TERRAZA, 1);
-    grafo_agregar_arista(g, CALABOZO, TORTUTA, 1);
-    grafo_agregar_arista(g, TERRAZA, BANIO, 1);
+    grafo_agregar_arista(g, SALA, COCINA, 2);
+    grafo_agregar_arista(g, SALA, BANIO, 4);
+    grafo_agregar_arista(g, SALA, JARDIN, 4);
+    grafo_agregar_arista(g, JARDIN, CALABOZO, 7);
+    grafo_agregar_arista(g, JARDIN, TERRAZA, 2);
+    grafo_agregar_arista(g, CALABOZO, TORTUTA, 3);
+    grafo_agregar_arista(g, TERRAZA, BANIO, 3);
 
     mostrar_matriz(g->adyacencias, g->cantidad, g->cant_aristas);
     printf("\n");
@@ -170,7 +240,14 @@ int main(){
     grafo_bfs(g, 0);
     printf("-->BFS");
     printf("\n");
-    destruir_grafo(g);
 
+    matriz_t* m;
+    m = transformar_matrizincidencia_matrizad(g);
+    printf("\n");
+    printf("M.Incidencia-->M.Adyacencia");
+    printf("\n");
+    mostrar_adyacencia(m->adyacencias, m->cantidad);
+    destruir_grafo(g);
+    matriz_liberar(m);
     return 0;
 }

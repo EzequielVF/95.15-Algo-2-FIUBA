@@ -158,13 +158,13 @@ int main(){
     grafo_t* g = grafo_crear(8);
 
     grafo_agregar_arista(g, ENTRADA, SALA, 1);
-    grafo_agregar_arista(g, SALA, COCINA, 1);
-    grafo_agregar_arista(g, SALA, BANIO, 1);
-    grafo_agregar_arista(g, SALA, JARDIN, 1);
-    grafo_agregar_arista(g, JARDIN, CALABOZO, 1);
-    grafo_agregar_arista(g, JARDIN, TERRAZA, 1);
-    grafo_agregar_arista(g, CALABOZO, TORTUTA, 1);
-    grafo_agregar_arista(g, TERRAZA, BANIO, 1);
+    grafo_agregar_arista(g, SALA, COCINA, 2);
+    grafo_agregar_arista(g, SALA, BANIO, 4);
+    grafo_agregar_arista(g, SALA, JARDIN, 4);
+    grafo_agregar_arista(g, JARDIN, CALABOZO, 7);
+    grafo_agregar_arista(g, JARDIN, TERRAZA, 2);
+    grafo_agregar_arista(g, CALABOZO, TORTUTA, 3);
+    grafo_agregar_arista(g, TERRAZA, BANIO, 3);
     /*
     printf("¿Puedo ir del calabozo a la entrada? %s\n", puedo_ir(g, CALABOZO, ENTRADA)?"SI":"NO");
     printf("¿Puedo ir de la sala a la entrada? %s\n", puedo_ir(g, SALA, ENTRADA)?"SI":"NO");
