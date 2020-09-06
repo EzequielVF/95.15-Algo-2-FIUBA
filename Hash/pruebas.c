@@ -44,12 +44,6 @@ void quitar_vehiculo(hash_t* garage, const char* patente){
   printf("Retirando vehiculo patente %s: ", patente);
   printf("%s\n", retorno==0?"OK":"ERROR");
 }
-
-void verificar_vehiculo(hash_t* garage, const char* patente, bool deberia_existir){
-  printf("Verifico el vehiculo patente %s: ", patente);
-  bool retorno = hash_contiene(garage, patente);
-  printf("%s\n", (retorno==deberia_existir)?"OK":"ERROR");
-}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void pruebas_hash_null(pa2m_t* probador){
     hash_t* garage = NULL;

@@ -315,6 +315,7 @@ void hash_destruir(hash_t* hash){
 
 	for(size_t i = 0; i < tamanio; i++){
 		if(hash->indice[i]){
+			printf("En el nivel:%zu hay %zu autos.\n", i, lista_elementos(hash->indice[i]));
 			while(!lista_vacia(hash->indice[i])){
 				aux = (cosa_t*)lista_elemento_en_posicion(hash->indice[i], ORIGEN);
 				lista_borrar_de_posicion(hash->indice[i], ORIGEN);
