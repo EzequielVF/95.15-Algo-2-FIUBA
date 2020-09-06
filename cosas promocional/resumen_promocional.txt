@@ -1,0 +1,171 @@
+Promocional
+---------------------------------------------------------------------------------------------------------
+HEAP
+Un Heap binario es un arbol binario.
+Una de sus caracteristicas es que es un arbol casi completo y se le agregan elementos de izquierda a derecha.
+Heap maximal el elemento mas grande arriba, Heap minimal el mas chico arriba.
+La complejidad de insertar y de eliminar un minimo/maximo es log de n.
+Solo se puede borrar la raiz.
+Su mejor version es utilizando un vector.
+
+Heapify transforma(reordena en un mismo lugar) un vector desordenado en un heap y su
+complejidad es n log n.
+
+Heapsort va sacando los minimos/maximos y los pone alfinal del vector y lo achica.
+
+Se pueden hacer Colas con prioridad de manera simple.
+
+(Se puede pedir cualquier cosa,codigo de heapify o armar un heapsort).
+----------------------------------------------------------------------------------------------------------
+HASH
+Es una estructura que permite ordenar datos en una posicion determinada (Diccionario).
+La clave es la que dictamina la posicion del elemento.
+Suele implementarse en vectores ya que el acceso a las posiciones debe ser directo.
+Insertar, eliminar y buscar tienen complejidad constante.
+La funcion de hasheo es la apartir de una clave asigna una posicion del vector valida.
+
+Algunas de las funciones de hasheo:
+Restas sucesivas
+Cuando se tienen huecoes de tamaño conocido entre loselementos, puede aprovecharse ese
+espacio en nuestro hash, realizando los corrimientos determinados por el problema.
+
+Aritmetica Modular
+Es sacar el modulo de un numero, consiste en calcular el resto de dividirlo en la cantidad
+de posiciones disponibles, las cantidades de posiciones primas favorecen la dispercion
+de la funcion.
+
+Mitad del cuadrado
+Consiste en elevar al cuadrado la clave y tomar como lugar en el hash, los digitos
+que ocupan determinada posicion, siempre la misma. El numero de digitos a tomar esta 
+determinado por el tamaño del hash.
+
+Trucamiento
+Consiste en ignorar parte de la clave y utilizar la parte restante directamente como
+indice.
+
+Plegamiento
+Consiste en la division de la clave en diferentes partes y su combinacion de un modo 
+conveniente para obtener el indice.
+
+Colisiones
+Cuando la funcion de hash devuelve, para un elemento una posicion ya ocupada se dice 
+que hay una colision.
+
+Existen 2 tipos de hashes, abiertos y cerrados y su principal diferencia consiste en la forma
+en que resuelven las colisiones, siendo los cerrados los que lo resuelven en su interior y los
+abiertos ubicandolos dentro de una lista por cada posicion del hash correspondiente a una clave.
+
+Los cerrados tienen 2 metodos:
+Zona de desborde: Se reserva una area extra dentro del hash para guardar los elementos en los
+que se presentaron colisiones. (Generalmente es un 10%+ de tu vector)
+Exploracion de posicion: Si se presenta una colicion el hash buscara alojar el elemento en el proximo
+espacio disponible.
+
+El Rehash es cuando el hash pasa cierto margen de carga, entonces se procede a agrandarlo
+volviendo a pasar por las funcion de hash todos los elementos dentro de este para asignarles 
+una posicion de acuerdo al nuevo tamaño disponible.
+Es importante ya que permite bajar la tasa de colisiones dentro del hash, y que la tasa de colisiones
+se matenga baja permite mantener los buenos tiempoes de busqueda y insercion que se buscan tener con 
+la implementacion de un hash.
+------------------------------------------------------------------------------------------------------------------
+GRAFOS
+
+Un grafo es un par ordenado G = (V, E)
+Donde V es un conjunto de vertices o nodos.
+E es un conjunto de aristas o arcos.
+
+Un grafo se dice DIRIGIDO O DIGRAFO si sus aristas tienen sentido/direccion.
+Un grafo es PESADO si sus aristas tienen pesos asignados, los pesos de las aristas pueden
+representar cosas diferentes (costos, distancias, capacidades, etc).
+El orden de un grafo es la cantidad de vertices.
+El tamaño de un grafo es la cantidad de aristas.
+El grado de un vertice es la cantidad de aristas incidentes.  
+Un grafo es NULO si no posee vertices ni aristas.
+Un grafo es VACIO si posee vertices pero no aristas.
+Una arista es un bucle cuando conecta al vertice consigo mismo.
+Un grafo es SIMPLE cuando no posee bucles ni aristas paralelas.
+Un grafo es COMPLETO cuando contiene todas las aristas posibles (Si agarro un vertice 
+este esta unido a todos los demas).
+Un camino es una secuencia de vertices (unidos por aristas).
+En un camino no puede haber vertices repetidos.
+Cuando un camino empieza y termina en el mismo vertices, se le dice ciclo.
+Un grafo es ACICLICO si no posee ciclos.
+
+Un grafo (no DIRIJIDO) es CONEXO si para cualquier par de vertices existe almenos un camino
+entre ellos.  
+En un DIGRAFO, un par de vertices {A, B} son FUERTEMENTE CONEXOS si existe un camino de A 
+hacia B y otro de B hacia A. Si para lograr dichos caminios es necesario remplazar una o
+mas aristas por aristas sin sentido, se dice que son DEBILMENTE CONEXOS. Si todos los
+pares {A, B} son FUERTEMENTE CONEXOS, el DIGRAFO es FUERTEMENTE CONEXO. 
+
+Un GRAFO es un ARBOL si es CONEXO y ACICLICO.
+
+Recorridos
+
+El recorrido en profundidad (DFS) consiste en ir recorriendo el grafo empezando desde un vertice
+cualquiera, y a acada paso se visita un vertice adyacente al ultimo visitado.
+La forma mas sencilla de pensarlo es con una pila:
+Apilar el vertice
+Quitar un vertice de la pila, visitarlo
+Apilar los vertices adyacentes al actual
+Repetir desde (2) hasta quedarse sin vertices
+
+El recorrido a lo ancho (BFS) consiste en ir recorriendo el grafo empezando desde un vertice
+cualquiera, y luego se van visitando los vertices adyacentes mas cercanos.
+
+En este caso se una una cola:
+Encolar el vertice
+Quitar un vertice de la cola, visitarlo
+Encolar los vertices adyacentes al actual
+Repetir desde (2) hasta quedarse sin vertices
+
+Formas de representar GRAFOS
+
+Matriz de adyacencia---> la de mate discreta, un cuadrado de 0 y 1 (aunque tambien puedo
+poner el peso de las aristas)
+Su costo en espacio es O(V al cuadrado)
+y tiene algunos problemas
+Respecto al espcio de memoria que utiliza es O(N al cuadrado)
+Si el grafo es un grafo DENSO o COMPLETO puede ser una buena representacion
+Si el grafo es un grafo DISPERSO es una pesima representacion.
+
+Lista de adyacencia---> Consiste que cada arista posee una lista simplemente enlazada
+de a que vertices esta unida.
+Su costo en espacio es de O(V + A)
+
+Matriz de incidencia---> Aca las columnas son los vertices y las aristas las filas
+
+Algoritmos greedy
+Porque es un algoritmo que trabaja a corto plazo y solo le interesa resolver en forma optima
+una iteracion del algoritmo.
+
+Primm y Kruskal --> Buscan "Minimos globales"
+
+Dijkstra o tambien llamado de caminos minimos, es un algoritmo de determinacion del camino
+mas corto, dado un vertice origen, hacia el resto de los vertices en un grafo que tiene
+pesos en cada arista.
+La idea subyacente en este algoritmo consiste en ir explorando todos los caminos mas cortos
+que parten del vertice origen y que llevan a todos los demas vertices, cuando se obtiene el
+camino mas coto desde el vertice origen hasta el resto de los vertices que componen el grafo,
+el algoritmo se detiene. 
+No funciona en grafos con aristas de peso negativo.
+Dijkstra es "Local"
+
+Prim 
+El Grafo debe ser conexo y no dirigido.
+Es un algoritmo greedy que permite encontrar el minimo spanning treen un arbol de expasion o
+spanning tree de ese grafo es un subgrafo que tiene que ser un arbol y contener todos los
+vertices del grafo inicial. Un arbol de expasion minimo o un arbol expandido minimo es un
+arbol expasion que pesa menos o igual que otros arboles de expasion. Todo grafo tiene un
+bosque de expasion minimo.
+
+Kruskal (Puede devolver mas de un arbol)
+Es un algoritmo de la teoria de grafos para encontrar un arbol de expasion minimo en un grafo
+conexo y ponderado. Es decir, busca un subconjunto de aristas que, formando un arbol, incluyen
+todos los vertices y donde el valor de la suma de todas las aristas del arbol es el minimo.
+Si el grafo no es conexo, entonces busca un bloque expandido minimo (para cada grupo existente).
+
+Floyd
+Aplica a grafos dirigidos
+
+Topologico
