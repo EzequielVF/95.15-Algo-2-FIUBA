@@ -1,5 +1,5 @@
 # Algo-2-UBA-
-Cosas que hice en la materia catedra Mendez
+Cosas que hice en la materia catedra Mendez 1°C 2020
 - Tp1
 - Tp2
 - TDA Hash
