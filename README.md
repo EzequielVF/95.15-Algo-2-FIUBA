@@ -1,4 +1,4 @@
-# Algo-2-UBA-
+# 95.15-Algo-2-FIUBA
 Cosas que hice en la materia catedra Mendez 1°C 2020
 - Tp1
 - Tp2
